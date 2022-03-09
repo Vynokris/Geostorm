@@ -28,10 +28,10 @@ namespace MyMathLib
         public static Vector2 Vector2FromSegment(Segment2 seg)          { return Vector2FromPoints(seg.A, seg.B); }
         
         // Vector dot product.
-        public static float Dot(this Vector2 v0, Vector2 v1) { return (v0.X * v1.X) + (v0.Y * v1.Y); }
+        public static float Dot(this Vector2 v0, Vector2 v1)            { return (v0.X * v1.X) + (v0.Y * v1.Y); }
 
         // Vector cross product.
-        public static float Cross(this Vector2 v0, Vector2 v1) { return (v0.X * v1.Y) - (v0.Y * v1.X); }
+        public static float Cross(this Vector2 v0, Vector2 v1)          { return (v0.X * v1.Y) - (v0.Y * v1.X); }
 
         // Returns a normalized copy of the vector.
         public static Vector2 GetNormalized(this Vector2 v)             { return v / v.Length(); }
@@ -40,7 +40,10 @@ namespace MyMathLib
         public static void Normalize(this ref Vector2 v)                { v = v.GetNormalized(); }
 
         // Modifies the length of the given vector to correspond to the given value.
-        public static void SetLength(this ref Vector2 v, float length)  { v = v.GetNormalized() * length; }
+        public static void SetLength(this ref Vector2 v, float length)        { v = v.GetNormalized() * length; }
+        
+        // Modifies the length of the given vector to correspond to the given value.
+        public static Vector2 GetModifiedLength(this Vector2 v, float length) { return v.GetNormalized() * length; }
 
         // Returns a vector width the destination's size and the source's signs.
         public static Vector2 GetCopiedSign(this Vector2 dest, Vector2 source)

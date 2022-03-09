@@ -18,12 +18,10 @@ namespace Geostorm
             imguiController.Load(screenWidth, screenHeight);
 
             game.bullets.Add(new Bullet());
-            game.bullets[0].pos = new System.Numerics.Vector2(screenWidth/2 - 100, screenHeight/2);
-            game.bullets[0].rotation = 0;
+            game.bullets[0].Pos = new System.Numerics.Vector2(screenWidth/2 - 100, screenHeight/2);
 
             game.enemies.Add(new Grunt());
-            game.enemies[0].pos = new System.Numerics.Vector2(screenWidth/2 + 100, screenHeight/2);
-            game.enemies[0].rotation = 0;
+            game.enemies[0].Pos = new System.Numerics.Vector2(screenWidth/2 + 100, screenHeight/2);
 
             // ----- Main game loop ----- //
 
