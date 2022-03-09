@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using static MyMathLib.Geometry2D;
 
 namespace Geostorm.Core
 {
@@ -6,14 +7,17 @@ namespace Geostorm.Core
     {
         protected int spawnDelay;
 
-        public sealed override void Update(GameInputs inputs)
+        public Enemy() { }
+        public Enemy(Vector2 _pos) : base(_pos, Vector2Zero(), 0) { }
+
+        public sealed override void Update(in GameInputs inputs, ref GameEvents gameEvents)
         {
             if (spawnDelay > 0)
                 spawnDelay--;
             else
-                DoUpdate(inputs);
+                DoUpdate(inputs, ref gameEvents);
         }
 
-        public abstract void DoUpdate(GameInputs inputs);
+        public abstract void DoUpdate(in GameInputs inputs, ref GameEvents gameEvents);
     }
 }

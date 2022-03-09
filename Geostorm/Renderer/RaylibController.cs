@@ -2,7 +2,6 @@
 using System.Numerics;
 
 using Raylib_cs;
-using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
 
 using Geostorm.Core;
@@ -14,7 +13,7 @@ namespace Geostorm.Renderer
     {
         public int ScreenWidth  { get; }
         public int ScreenHeight { get; }
-        public EntityVertices entityVertices { get; }
+        public EntityVertices entityVertices { get; } = new();
 
 
         // ---------- Constructor & destructor ---------- //
@@ -23,7 +22,6 @@ namespace Geostorm.Renderer
         {
             ScreenWidth  = screenW;
             ScreenHeight = screenH;
-            entityVertices = new();
 
             Raylib.SetTraceLogCallback(&Logging.LogConsole);
             Raylib.SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT | ConfigFlags.FLAG_VSYNC_HINT | ConfigFlags.FLAG_WINDOW_RESIZABLE);
@@ -51,6 +49,9 @@ namespace Geostorm.Renderer
         {
             GameInputs inputs = new();
 
+            // Get the screensize.
+            inputs.screenSize = Vector2Create(ScreenWidth, ScreenHeight);
+
             // Get the delta time.
             inputs.DeltaTime = Raylib.GetFrameTime();
             
@@ -67,7 +68,8 @@ namespace Geostorm.Renderer
                     inputs.Movement.X += 1;
             
                 // Get the dashing input.
-                if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT_SHIFT))
+                if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT_SHIFT) ||
+                    Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
                     inputs.Dash = true;
 
                 // Get the shooting input.
@@ -129,7 +131,7 @@ namespace Geostorm.Renderer
             else return;
 
             // Create the player's transformed vertices.
-            Vector2 firstVertex = vertices[0].GetRotatedAsPoint(entity.rotation, Vector2Zero()) + entity.pos;
+            Vector2 firstVertex = vertices[0].GetRotatedAsPoint(entity.Rotation, Vector2Zero()) + entity.Pos;
             Vector2 curVertex   = firstVertex;
             Vector2 prevVertex;
 
@@ -137,7 +139,7 @@ namespace Geostorm.Renderer
             foreach(Vector2 vertex in vertices)
             {
                 prevVertex = curVertex;
-                curVertex  = vertex.GetRotatedAsPoint(entity.rotation, Vector2Zero()) + entity.pos;
+                curVertex  = vertex.GetRotatedAsPoint(entity.Rotation, Vector2Zero()) + entity.Pos;
 
                 if (prevVertex != curVertex)
                 { 
