@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using static MyMathLib.Geometry2D;
+using Geostorm.GameData;
 
 namespace Geostorm.Core
 {
@@ -8,6 +9,7 @@ namespace Geostorm.Core
         public Vector2 Pos      { get; set; }
         public Vector2 Velocity { get; set; }
         public float   Rotation { get; set; }
+        public float   Health   { get; set; }
     }
 
     public abstract class Entity : IEntity
@@ -15,9 +17,10 @@ namespace Geostorm.Core
         public Vector2 Pos      { get; set; } = Vector2Zero();
         public Vector2 Velocity { get; set; } = Vector2Zero();
         public float   Rotation { get; set; } = 0;
+        public float   Health   { get; set; } = 0;
 
         public Entity() { }
-        public Entity(Vector2 _pos, Vector2 _velocity, float _rotation) { Pos = _pos; Velocity = _velocity; Rotation = _rotation; }
-        public abstract void Update(in GameInputs inputs, ref GameEvents gameEvents);
+        public Entity(Vector2 pos, Vector2 velocity, float rotation, float health) { Pos = pos; Velocity = velocity; Rotation = rotation; Health = health; }
+        public abstract void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents);
     }
 }

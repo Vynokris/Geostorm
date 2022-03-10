@@ -1,23 +1,24 @@
 ﻿using System.Numerics;
 using static MyMathLib.Geometry2D;
+using Geostorm.GameData;
 
 namespace Geostorm.Core
 {
     public abstract class Enemy : Entity
     {
-        protected int spawnDelay;
+        protected int SpawnDelay = 0;
 
         public Enemy() { }
-        public Enemy(Vector2 _pos) : base(_pos, Vector2Zero(), 0) { }
+        public Enemy(Vector2 pos, float health, int spawnDelay) : base(pos, Vector2Create(0, 3), 0, health) { SpawnDelay = spawnDelay; }
 
-        public sealed override void Update(in GameInputs inputs, ref GameEvents gameEvents)
+        public sealed override void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
         {
-            if (spawnDelay > 0)
-                spawnDelay--;
+            if (SpawnDelay <= 0)
+                DoUpdate(gameState, gameInputs, ref gameEvents);
             else
-                DoUpdate(inputs, ref gameEvents);
+                SpawnDelay--;
         }
 
-        public abstract void DoUpdate(in GameInputs inputs, ref GameEvents gameEvents);
+        public abstract void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents);
     }
 }

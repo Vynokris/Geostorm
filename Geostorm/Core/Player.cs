@@ -3,36 +3,39 @@ using System.Collections.Generic;
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
 using Geostorm.Utility;
+using Geostorm.GameData;
 
 namespace Geostorm.Core
 {
     public class Player : Entity
     {
         public int Score { get; private set; }  = 0;
-        private readonly Cooldown ShootCooldown = new(2);
+        private readonly Cooldown ShootCooldown = new(5);
         private readonly Cooldown DashCooldown  = new(60);
         private readonly Cooldown DashingFrames = new(15);
+        public  readonly Cooldown Invincibility = new(60*3);
         private readonly int MaxVelocity        = 10;
         private readonly int DashVelocity       = 50;
 
         public Player() { DashingFrames.Counter = 0; }
-        public Player(Vector2 _pos, Vector2 _velocity, float _rotation) : base(_pos, _velocity, _rotation) { }
+        public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity, rotation, 3) { }
 
-        public override void Update(in GameInputs inputs, ref GameEvents gameEvents)
+        public override void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
         {
             // Update the player's cooldowns.
             ShootCooldown.Update();
             DashCooldown.Update();
             DashingFrames.Update();
+            Invincibility.Update();
 
             // -- Accelerate -- //
-            if (inputs.Movement != Vector2Zero())
+            if (gameInputs.Movement != Vector2Zero())
             {
                 // Update the game events.
-                gameEvents.playerMoving = true;
+                gameEvents.PlayerMoving = true;
 
                 // Get the direction of the joystick.
-                float dirAngle = inputs.Movement.GetAngle();
+                float dirAngle = gameInputs.Movement.GetAngle();
 
                 // Initiate a dash by going at dashing velocity in the moving dir.
                 if (DashingFrames.CompletionRatio() == 1)
@@ -60,27 +63,26 @@ namespace Geostorm.Core
             }
 
             // -- Turn -- //
-            if (inputs.ShootDir != Vector2Zero())
+            if (gameInputs.ShootDir != Vector2Zero())
             {
-                Rotation = inputs.ShootDir.GetAngle();
+                Rotation = gameInputs.ShootDir.GetAngle();
             }
             else
             {
-                Rotation = Vector2FromPoints(Pos, inputs.ShootTarget).GetAngle();
+                Rotation = Vector2FromPoints(Pos, gameInputs.ShootTarget).GetAngle();
             }
 
             // -- Shoot -- //
-            if (inputs.Shoot)
+            if (gameInputs.Shoot)
             {
-                gameEvents.playerShooting = true;
+                gameEvents.PlayerShooting = true;
             }
 
             // -- Dash -- //
-            if (inputs.Dash)
+            if (gameInputs.Dash)
             {
-                gameEvents.playerDashing = true;
+                gameEvents.PlayerDashing = true;
                 Dash();
-                System.Console.WriteLine("Dashing");
             }
 
             // Move the player according to its velocity.
@@ -92,7 +94,8 @@ namespace Geostorm.Core
             if (ShootCooldown.HasEnded())
             {
                 ShootCooldown.Reset();
-                bullets.Add(new Bullet(Pos, Rotation));
+                bullets.Add(new Bullet(Pos + Vector2FromAngle(Rotation, -6).GetNormal() + Vector2FromAngle(Rotation, 21), Rotation));
+                bullets.Add(new Bullet(Pos + Vector2FromAngle(Rotation,  6).GetNormal() + Vector2FromAngle(Rotation, 21), Rotation));
             }
         }
 

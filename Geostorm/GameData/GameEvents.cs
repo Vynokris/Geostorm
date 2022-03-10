@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Geostorm.Core
+namespace Geostorm.GameData
 {
     public class GameEvents
     {
-        public bool playerMoving;
-        public bool playerDashing;
-        public bool playerShooting;
+        public bool PlayerMoving;
+        public bool PlayerDashing;
+        public bool PlayerShooting;
     }
 }
