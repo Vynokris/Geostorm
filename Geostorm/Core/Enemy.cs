@@ -9,7 +9,7 @@ namespace Geostorm.Core
         protected int SpawnDelay = 0;
 
         public Enemy() { }
-        public Enemy(Vector2 pos, float health, int spawnDelay) : base(pos, Vector2Create(0, 3), 0, health) { SpawnDelay = spawnDelay; }
+        public Enemy(Vector2 pos, float health, int spawnDelay) : base(pos, Vector2Create(3, 0), 0, health) { SpawnDelay = spawnDelay; }
 
         public sealed override void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
         {
