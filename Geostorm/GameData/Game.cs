@@ -10,33 +10,50 @@ namespace Geostorm.GameData
         public Player player        = new();
         public List<Enemy> enemies  = new();
         public List<Bullet> bullets = new();
-        public GameEvents gameEvents;
+        public readonly EntityVertices entityVertices = new();
 
-        public void Update(GameInputs inputs)
+        public void Update(GameState gameState, GameInputs gameInputs)
         {
             // Reset the gameEvents to be give it to all entitites.
-            gameEvents = new();
+            GameEvents gameEvents = new();
 
-            // Update all entities.
-            player.Update(inputs, ref gameEvents);
-            foreach(Enemy  enemy  in enemies)  enemy.Update(inputs, ref gameEvents);
+            // Update the game state with entity information.
+            gameState.PlayerPos = player.Pos;
+
+            // Update the entity collisions.
+            Collisions.DoCollisions(ref player, ref bullets, ref enemies, entityVertices);
+
+            // Update the player.
+            player.Update(gameState, gameInputs, ref gameEvents);
+
+            // Update the bullets.
             for (int i = bullets.Count-1; i >= 0; i--) 
             {
-                bullets[i].Update(inputs, ref gameEvents);
-                if (bullets[i].destroyed)
+                bullets[i].Update(gameState, gameInputs, ref gameEvents);
+                if (bullets[i].Health <= 0)
                     bullets.Remove(bullets[i]);
             }
 
+            // Update the enemies.
+            for (int i = enemies.Count-1; i >= 0; i--)
+            {
+                enemies[i].Update(gameState, gameInputs, ref gameEvents);
+                if (enemies[i].Health <= 0)
+                    enemies.Remove(enemies[i]);
+            }
+
             // Add a bullet if the player is shooting.
-            if (gameEvents.playerShooting)
+            if (gameEvents.PlayerShooting)
                 player.Shoot(ref bullets);
         }
 
         public void Draw(in RaylibController raylibController)
         {
-            raylibController.DrawEntity(player);
-            foreach(Enemy  enemy  in enemies) raylibController.DrawEntity(enemy);
-            foreach(Bullet bullet in bullets) raylibController.DrawEntity(bullet);
+            raylibController.DrawEntity(player, entityVertices);
+            if (!player.Invincibility.HasEnded())
+                raylibController.DrawPlayerShield(player.Pos, player.Invincibility.Counter);
+            foreach(Enemy  enemy  in enemies) raylibController.DrawEntity(enemy, entityVertices);
+            foreach(Bullet bullet in bullets) raylibController.DrawEntity(bullet, entityVertices);
         }
     }
 }

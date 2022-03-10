@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using static System.Math;
+using static System.MathF;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -13,94 +13,116 @@ namespace MyMathLib
         // ---- Vector2 ---- //
 
         // Returns a null vector.
-        public static Vector2 Vector2Zero()                             { return new Vector2(0, 0); }
+        public static Vector2 Vector2Zero()                         { return new Vector2(0, 0); }
 
         // Creates a vector from two values.
-        public static Vector2 Vector2Create(float X, float Y)           { return new Vector2(X, Y); }
+        public static Vector2 Vector2Create(in float X, in float Y) { return new Vector2(X, Y); }
 
         // Creates a vector from one point to another.
-        public static Vector2 Vector2FromPoints(Vector2 p0, Vector2 p1) { return new Vector2(p1.X - p0.X, p1.Y - p0.Y); }
+        public static Vector2 Vector2FromPoints(in Vector2 p0, in Vector2 p1) { return new Vector2(p1.X - p0.X, p1.Y - p0.Y); }
 
         // Creates a vector given an angle and a length.
-        public static Vector2 Vector2FromAngle(float rad, float length) { return new Vector2((float)Cos(rad) * length,
-                                                                                             (float)Sin(rad) * length); }
+        public static Vector2 Vector2FromAngle(in float rad, in float length) { return new Vector2((float)Cos(rad) * length,
+                                                                                                   (float)Sin(rad) * length); }
         // Creates a vector from a segment.
-        public static Vector2 Vector2FromSegment(Segment2 seg)          { return Vector2FromPoints(seg.A, seg.B); }
+        public static Vector2 Vector2FromSegment(in Segment2 seg)    { return Vector2FromPoints(seg.A, seg.B); }
         
         // Vector dot product.
-        public static float Dot(this Vector2 v0, Vector2 v1)            { return (v0.X * v1.X) + (v0.Y * v1.Y); }
+        public static float Dot(in this Vector2 v0, in Vector2 v1)   { return (v0.X * v1.X) + (v0.Y * v1.Y); }
 
         // Vector cross product.
-        public static float Cross(this Vector2 v0, Vector2 v1)          { return (v0.X * v1.Y) - (v0.Y * v1.X); }
-
-        // Returns a normalized copy of the vector.
-        public static Vector2 GetNormalized(this Vector2 v)             { return v / v.Length(); }
+        public static float Cross(in this Vector2 v0, in Vector2 v1) { return (v0.X * v1.Y) - (v0.Y * v1.X); }
 
         // Normalizes the vector so that its length is 1.
-        public static void Normalize(this ref Vector2 v)                { v = v.GetNormalized(); }
+        public static void Normalize(ref this Vector2 v)             { v = v.GetNormalized(); }
+
+        // Returns a normalized copy of the vector.
+        public static Vector2 GetNormalized(in this Vector2 v)       { return v / v.Length(); }
 
         // Modifies the length of the given vector to correspond to the given value.
-        public static void SetLength(this ref Vector2 v, float length)        { v = v.GetNormalized() * length; }
+        public static void SetLength(ref this Vector2 v, in float length)           { v = v.GetModifiedLength(length); }
         
         // Modifies the length of the given vector to correspond to the given value.
-        public static Vector2 GetModifiedLength(this Vector2 v, float length) { return v.GetNormalized() * length; }
-
-        // Returns a vector width the destination's size and the source's signs.
-        public static Vector2 GetCopiedSign(this Vector2 dest, Vector2 source)
-        {
-            return new Vector2((float)Math.CopySign((float)dest.X, (float)source.X),
-                               (float)Math.CopySign((float)dest.Y, (float)source.Y));
-        }
+        public static Vector2 GetModifiedLength(in this Vector2 v, in float length) { return v.GetNormalized() * length; }
 
         // Copies the signs from the source vector to the destination vector.
-        public static void CopySign(this ref Vector2 dest, Vector2 source)
+        public static void CopySign(ref this Vector2 dest, in Vector2 source)
         {
             dest = dest.GetCopiedSign(source);
         }
 
+        // Returns a vector width the destination's size and the source's signs.
+        public static Vector2 GetCopiedSign(in this Vector2 dest, in Vector2 source)
+        {
+            return new Vector2(MathF.CopySign(dest.X, source.X),
+                               MathF.CopySign(dest.Y, source.Y));
+        }
+
         // Returns the normal of the vector.
-        public static Vector2 GetNormal(this Vector2 v) { return new Vector2(-v.Y, v.X); }
+        public static Vector2 GetNormal(in this Vector2 v) { return new Vector2(-v.Y, v.X); }
 
         // Interprets the vector as a point and returns the distance to another point.
-        public static float GetDistanceFromPoint(this Vector2 p0, Vector2 p1) { return (p1 - p0).Length(); }
+        public static float GetDistanceFromPoint(in this Vector2 p0, in Vector2 p1) { return (p1 - p0).Length(); }
 
         // Returns the angle (in radians) of the vector.
-        public static float GetAngle(this Vector2 v)
+        public static float GetAngle(in this Vector2 v)
         {
-            return (float)Math.CopySign((float)Acos((double)v.GetNormalized().X),
-                                        (float)Asin((double)v.GetNormalized().Y));
+            return (float)Math.CopySign(Acos(v.GetNormalized().X),
+                                        Asin(v.GetNormalized().Y));
         }
 
         // Returns the angle (in radians) between two vectors.
-        public static float GetAngleWithVector(this Vector2 v0, Vector2 v1)
+        public static float GetAngleWithVector(in this Vector2 v0, in Vector2 v1)
         {
             float v0angle = v0.GetAngle();
             float v1angle = v1.GetAngle();
             return (v0angle >= v1angle ? (v0angle - v1angle) : (v1angle - v0angle));
         }
 
-        // Rotates the given vector by the given angle.
-        public static void Rotate(this ref Vector2 v, float angle)
+        // Changes the vector's angle while conserving its length.
+        public static void SetAngle(this ref Vector2 v, in float angle)
         {
-            float vLength = v.Length();
-            float vAngle = v.GetAngle();
-            v = new Vector2((float)Cos(vAngle + angle) * vLength, (float)Sin(vAngle + angle) * vLength);
+            v = v.GetModifiedAngle(angle);
+        }
+
+        // Changes the vector's angle while conserving its length.
+        public static Vector2 GetModifiedAngle(in this Vector2 v, in float angle)
+        {
+            return Vector2FromAngle(angle, v.Length());
         }
 
         // Rotates the given vector by the given angle.
-        public static Vector2 GetRotated(this ref Vector2 v, float angle)
+        public static void Rotate(ref this Vector2 v, in float angle)
+        {
+            v = v.GetRotated(angle);
+        }
+
+        // Rotates the given vector by the given angle.
+        public static Vector2 GetRotated(ref this Vector2 v, in float angle)
         {
             float vLength = v.Length();
             float vAngle = v.GetAngle();
             return new Vector2((float)Cos(vAngle + angle) * vLength, (float)Sin(vAngle + angle) * vLength);
         }
 
-        // Rotates the vector as a point around the given origin.
-        public static void RotateAsPoint(this ref Vector2 point, in float angle, in Vector2 origin)
+        // Scales the vector as a point around the given origin.
+        public static void ScaleAsPoint(ref this Vector2 point, in Vector2 scale, in Vector2 origin)
+        {
+            point = point.GetScaledAsPoint(scale, origin);
+        }
+
+        // Scales the vector as a point around the given origin.
+        public static Vector2 GetScaledAsPoint(in this Vector2 point, in Vector2 scale, in Vector2 origin)
         {
             Vector2 origToPoint = Vector2FromPoints(origin, point);
-            origToPoint.Rotate(angle);
-            point = origin + origToPoint;
+            origToPoint *= scale;
+            return origin + origToPoint;
+        }
+
+        // Rotates the vector as a point around the given origin.
+        public static void RotateAsPoint(ref this Vector2 point, in float angle, in Vector2 origin)
+        {
+            point = point.GetRotatedAsPoint(angle, origin);
         }
 
         // Rotates the vector as a point around the given origin.
@@ -112,7 +134,7 @@ namespace MyMathLib
         }
         
         // Calculates linear interpolation for a value from a start point to an end point.
-        public static Vector2 Point2Lerp(float val, Vector2 start, Vector2 end)
+        public static Vector2 Point2Lerp(in float val, in Vector2 start, in Vector2 end)
         {
             return new Vector2(Arithmetic.Lerp(val, start.X, end.X),
                                Arithmetic.Lerp(val, start.Y, end.Y));
@@ -120,7 +142,7 @@ namespace MyMathLib
 
 
         // ---- Segment2 ---- //
-        public class Segment2
+        public class Segment2 : IShape
         {
             public Vector2 A, B;
 
@@ -128,10 +150,10 @@ namespace MyMathLib
             public Segment2() { A = Vector2Zero(); B = Vector2Zero(); }
 
             // Segment from points.
-            public Segment2(Vector2 a, Vector2 b) { A = a; B = b; }
+            public Segment2(in Vector2 a, in Vector2 b) { A = a; B = b; }
 
             // Segment from point and vector.
-            public Segment2(Vector2 origin, Vector2 vec, bool vector) { A = origin; B = origin + vec; }
+            public Segment2(in Vector2 origin, in Vector2 vec, in bool vector) { A = origin; B = origin + vec; }
 
             // Returns the center of mass of the Segment2.
             public Vector2 GetCenterOfMass() { return Vector2Create((A.X + B.X) / 2, (A.Y + B.Y) / 2); }
@@ -140,7 +162,7 @@ namespace MyMathLib
             public int GetSidesNum() { return 1; }
 
             // Returns the side of the Segment2 that corresponds to the given index.
-            public Segment2 GetSide(int index)
+            public Segment2 GetSide(in int index)
             {
                 Debug.Assert(0 <= index && index < 1);
                 return this;
@@ -150,7 +172,7 @@ namespace MyMathLib
             public int GetVerticesNum() { return 2; }
 
             // Returns the vertex of the Segment2 that corresponds to the given index.
-            public Vector2 GetVertex(int index)
+            public Vector2 GetVertex(in int index)
             {
                 Debug.Assert(0 <= index && index< 2);
 
@@ -160,14 +182,21 @@ namespace MyMathLib
                     _ => Vector2Zero(),
                 };
             }
+            
+            // Returns the radius of the circle in which the segment is inscribed.
+            public float InscribedCircleRadius()
+            {
+               Vector2 O = GetCenterOfMass();
+                return Vector2FromPoints(O, A).Length();
+            }
 
             // Moves the Segment2 by the given vector.
-            public void Move(Vector2 vec) { A += vec; B += vec; }
+            public void Move(in Vector2 vec) { A += vec; B += vec; }
         }
 
 
         // ---- Triangle2 ---- //
-        public class Triangle2
+        public class Triangle2 : IShape
         {
             public Vector2 A, B, C;
 
@@ -175,7 +204,7 @@ namespace MyMathLib
             public Triangle2() { A = Vector2Zero(); B = Vector2Zero(); C = Vector2Zero(); }
 
             // Triangle from points.
-            public Triangle2(Vector2 a, Vector2 b, Vector2 c) { A = a; B = b; C = c; }
+            public Triangle2(in Vector2 a, in Vector2 b, in Vector2 c) { A = a; B = b; C = c; }
 
             // Returns the center of mass of the triangle.
             public Vector2 GetCenterOfMass() { return Vector2Create((A.X + B.X + C.X) / 3,
@@ -185,7 +214,7 @@ namespace MyMathLib
             public int GetSidesNum() { return 3; }
 
             // Returns the side of the triangle that corresponds to the given index.
-            public Segment2 GetSide(int index)
+            public Segment2 GetSide(in int index)
             {
                 Debug.Assert(0<= index && index< 3);
 
@@ -202,7 +231,7 @@ namespace MyMathLib
             public int GetVerticesNum() { return 3; }
 
             // Returns the vertex of the triangle that corresponds to the given index.
-            public Vector2 GetVertex(int index)
+            public Vector2 GetVertex(in int index)
             {
                 Debug.Assert(0 <= index && index< 3);
 
@@ -215,13 +244,25 @@ namespace MyMathLib
                 };
             }
 
+            // Returns the radius of the circle in which the triangle is inscribed (NOT TESTED).
+            public float InscribedCircleRadius()
+            {
+                // TODO: This is untested.
+                float a = Vector2FromPoints(A, B).Length();
+                float b = Vector2FromPoints(B, C).Length();
+                float c = Vector2FromPoints(C, A).Length();
+                float s = (a + b + c) / 2; // Half of perimeter.
+                float area = Sqrt(s * (s - a) * (s - b) * (s - c));
+                return (a*b*c) / 4 * area;
+            }
+
             // Moves the triangle by the given vector.
-            public void Move(Vector2 vec) { A += vec; B += vec; C += vec; }
+            public void Move(in Vector2 vec) { A += vec; B += vec; C += vec; }
         }
 
 
         // ---- Rectangle2 ---- //
-        public class Rectangle2
+        public class Rectangle2 : IShape
         {
             public Vector2 O;
             public float W, H;
@@ -230,7 +271,7 @@ namespace MyMathLib
             public Rectangle2() { O = Vector2Zero(); W = 0; H = 0; }
 
             // Rectangle from posX posY, width and height.
-            public Rectangle2(float x, float y, float w, float h) { O = Vector2Create(x, y); W = w; H = h; }
+            public Rectangle2(in float x, in float y, in float w, in float h) { O = Vector2Create(x, y); W = w; H = h; }
 
             // Returns the center of mass of the rectangle.
             public Vector2 GetCenterOfMass() { return Vector2Create(O.X + W / 2, O.Y + H / 2); }
@@ -239,7 +280,7 @@ namespace MyMathLib
             public int GetSidesNum() { return 4; }
 
             // Returns the side of the rectangle that corresponds to the given index.
-            public Segment2 GetSide(int index)
+            public Segment2 GetSide(in int index)
             {
                 Debug.Assert(0 <= index && index < 4);
 
@@ -257,7 +298,7 @@ namespace MyMathLib
             public int GetVerticesNum() { return 4; }
 
             // Returns the vertex of the rectangle that corresponds to the given index.
-            public Vector2 GetVertex(int index)
+            public Vector2 GetVertex(in int index)
             {
                 Debug.Assert(0 <= index && index< 4);
 
@@ -271,13 +312,19 @@ namespace MyMathLib
                 };
             }
 
+            // Returns the circle's radius.
+            public float InscribedCircleRadius()
+            {
+                return Vector2FromPoints(O, O + Vector2Create(W/2, H/2)).Length();
+            }
+
             // Moves the rectangle by the given vector.
-            public void Move(Vector2 vec) { O += vec; }
+            public void Move(in Vector2 vec) { O += vec; }
         }
 
 
         // ---- Polygon2 ---- //
-        public class Polygon2
+        public class Polygon2 : IShape
         {
             public Vector2 O;
             public float Radius, Rot;
@@ -287,7 +334,7 @@ namespace MyMathLib
             public Polygon2() { O = Vector2Zero(); Radius = 0; Rot = 0; Sides = 3; }
 
             // Polygon from origin, radius, rotation and number of sides.
-            public Polygon2(float x, float y, float radius, float rotation, int sides)
+            public Polygon2(in float x, in float y, in float radius, in float rotation, in int sides)
             {
                 O = Vector2Create(x, y); Radius = radius; Rot = rotation; Sides = sides;
             }
@@ -299,7 +346,7 @@ namespace MyMathLib
             public int GetSidesNum() { return Sides; }
 
             // Returns the side of the polygon that corresponds to the given index.
-            public Segment2 GetSide(int index)
+            public Segment2 GetSide(in int index)
             {
                 Debug.Assert(0 <= index && index < Sides);
 
@@ -315,7 +362,7 @@ namespace MyMathLib
             public int GetVerticesNum() { return Sides; }
 
             // Returns the vertex of the polygon that corresponds to the given index.
-            public Vector2 GetVertex(int index)
+            public Vector2 GetVertex(in int index)
             {
                 Debug.Assert(0 <= index && index < Sides);
 
@@ -324,13 +371,19 @@ namespace MyMathLib
                 return O + Vector2FromAngle(angle_offset + Rot, Radius);
             }
 
+            // Returns the polygon's radius.
+            public float InscribedCircleRadius()
+            {
+                return Radius;
+            }
+
             // Moves the polygon by the given vector.
-            public void Move(Vector2 vec) { O += vec; }
+            public void Move(in Vector2 vec) { O += vec; }
         }
 
 
         // ---- Circle2 ---- //
-        public class Circle2
+        public class Circle2 : IShape
         {
             public Vector2 O;
             public float Radius;
@@ -339,7 +392,7 @@ namespace MyMathLib
             public Circle2() { O = Vector2Zero(); Radius = 0; }
 
             // Circle from position and radius.
-            public Circle2(float x, float y, float radius) { O = Vector2Create(x, y); Radius = radius; }
+            public Circle2(in float x, in float y, in float radius) { O = Vector2Create(x, y); Radius = radius; }
 
             // Returns the center of mass of the circle.
             public Vector2 GetCenterOfMass() { return O; }
@@ -348,20 +401,37 @@ namespace MyMathLib
             public int GetSidesNum() { return 1; }
 
             // Does nothing and returns a null Segment2.
-            public Segment2 GetSide(int index) { return new Segment2(); }
+            public Segment2 GetSide(in int index) { return new Segment2(); }
 
             // Returns the number of vertices of the circle.
             public int GetVerticesNum() { return 0; }
 
             // Does nothing and returns a null vector.
-            public Vector2 GetVertex(int index) { return Vector2Zero(); }
+            public Vector2 GetVertex(in int index) { return Vector2Zero(); }
+
+            // Returns the circle's radius.
+            public float InscribedCircleRadius()
+            {
+                return Radius;
+            }
 
             // Moves the circle by the given vector.
-            public void Move(Vector2 vec) { O += vec; }
+            public void Move(in Vector2 vec) { O += vec; }
         }
 
 
         // ---- Shapes ---- //
+
+        public interface IShape
+        {
+            public Vector2  GetCenterOfMass();
+            public int      GetSidesNum();
+            public Segment2 GetSide(in int index);
+            public int      GetVerticesNum();
+            public Vector2  GetVertex(in int index);
+            public float    InscribedCircleRadius();
+            public void     Move(in Vector2 vec);
+        }
 
         // Union that can contain any shape.
         [StructLayout(LayoutKind.Explicit)]

@@ -2,9 +2,12 @@
 using System.Numerics;
 
 using Raylib_cs;
+using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
+using static MyMathLib.Colors;
 
 using Geostorm.Core;
+using Geostorm.GameData;
 
 
 namespace Geostorm.Renderer
@@ -13,7 +16,6 @@ namespace Geostorm.Renderer
     {
         public int ScreenWidth  { get; }
         public int ScreenHeight { get; }
-        public EntityVertices entityVertices { get; } = new();
 
 
         // ---------- Constructor & destructor ---------- //
@@ -43,17 +45,27 @@ namespace Geostorm.Renderer
         public bool WindowShouldClose() { return Raylib.WindowShouldClose(); }
 
 
-        // ---------- Keyboard input ---------- //
+        // ---------- Game state ---------- //
 
-        public GameInputs HandleInputs()
+        public GameState GetGameState()
         {
-            GameInputs inputs = new();
+            GameState gameState = new();
 
             // Get the screensize.
-            inputs.screenSize = Vector2Create(ScreenWidth, ScreenHeight);
+            gameState.ScreenSize = Vector2Create(ScreenWidth, ScreenHeight);
 
             // Get the delta time.
-            inputs.DeltaTime = Raylib.GetFrameTime();
+            gameState.DeltaTime = Raylib.GetFrameTime();
+
+            return gameState;
+        }
+
+
+        // ---------- Keyboard input ---------- //
+
+        public GameInputs GetInputs()
+        {
+            GameInputs inputs = new();
             
             if (!Raylib.IsGamepadAvailable(0))
             { 
@@ -116,43 +128,26 @@ namespace Geostorm.Renderer
             Raylib.EndDrawing();
         }
 
-        public void DrawEntity<T>(in T entity) where T : IEntity
+        public void DrawEntity<T>(in T entity, in EntityVertices entityVertices) where T : IEntity
         {
-            Vector2[] vertices;
-            Type entityType = entity.GetType();
+            Vector2[] vertices    = entityVertices.GetEntityVertices(entity);
+            int       vertexCount = vertices.Length;
+            RGBA      rgba        = entityVertices.GetEntityColor   (entity);
+            Color     color       = new(RoundInt(rgba.R*255), RoundInt(rgba.G*255), RoundInt(rgba.B*255), RoundInt(rgba.A*255)); 
 
-            // Get the right vertices in function of the entity.
-            if      (entityType == new Player().GetType())
-                vertices = entityVertices.Player;
-            else if (entityType == new Bullet().GetType())
-                vertices = entityVertices.Bullet;
-            else if (entityType == new Grunt().GetType())
-                vertices = entityVertices.Grunt;
-            else return;
-
-            // Create the player's transformed vertices.
-            Vector2 firstVertex = vertices[0].GetRotatedAsPoint(entity.Rotation, Vector2Zero()) + entity.Pos;
-            Vector2 curVertex   = firstVertex;
-            Vector2 prevVertex;
-
-            // Loop on the player's vertices, transform them and draw lines between them.
-            foreach(Vector2 vertex in vertices)
+            // Loop on the entity's vertices and draw lines between them.
+            for (int i = 0; i < vertexCount; i++)
             {
-                prevVertex = curVertex;
-                curVertex  = vertex.GetRotatedAsPoint(entity.Rotation, Vector2Zero()) + entity.Pos;
-
-                if (prevVertex != curVertex)
-                { 
-                    Raylib.DrawLine((int)curVertex.X,  (int)curVertex.Y,
-                                    (int)prevVertex.X, (int)prevVertex.Y,
-                                    Color.WHITE);
-                }
+                Raylib.DrawLine((int)vertices[i].X,                 (int)vertices[i].Y,
+                                (int)vertices[(i+1)%vertexCount].X, (int)vertices[(i+1)%vertexCount].Y,
+                                color);
             }
-            
-            // Draw the last line.
-            Raylib.DrawLine((int)curVertex.X,  (int)curVertex.Y,
-                            (int)firstVertex.X, (int)firstVertex.Y,
-                            Color.WHITE);
+        }
+
+        public void DrawPlayerShield(Vector2 pos, float remainingFrames)
+        {
+            if (remainingFrames > 90 || (int)(remainingFrames / 10) % 3 == 0)
+                Raylib.DrawCircleLines((int)pos.X, (int)pos.Y, 25, Color.WHITE);
         }
     }
 }

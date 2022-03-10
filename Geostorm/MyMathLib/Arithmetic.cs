@@ -45,12 +45,12 @@ namespace MyMathLib
         }
 
         // Linear interpolation between two given colors.
-        public static Color ColorLerp(float val, Color start, Color end)
+        public static Colors.RGBA ColorLerp(float val, Colors.RGBA start, Colors.RGBA end)
         {
-            return new Color(start.R + val * (end.R - start.R),
-                             start.G + val * (end.G - start.G),
-                             start.B + val * (end.B - start.B),
-                             start.A + val * (end.A - start.A));
+            return new Colors.RGBA(start.R + val * (end.R - start.R),
+                            start.G + val * (end.G - start.G),
+                            start.B + val * (end.B - start.B),
+                            start.A + val * (end.A - start.A));
         }
 
         // Remaps the given value from one range to another.
@@ -73,7 +73,7 @@ namespace MyMathLib
         }
 
         // Blend between two HSV colors.
-        public static HSV BlendHSV(HSV color0, HSV color1)
+        public static Colors.HSV BlendHSV(Colors.HSV color0, Colors.HSV color1)
         {
             Vector2 totalVec = Geometry2D.Vector2FromAngle(color0.H, 1)
                              + Geometry2D.Vector2FromAngle(color1.H, 1);
@@ -82,7 +82,7 @@ namespace MyMathLib
             float avgSat = (color0.S + color1.S) / 2;
             float avgVal = (color0.V + color1.V) / 2;
 
-            return new HSV(avgHue, avgSat, avgVal);
+            return new Colors.HSV(avgHue, avgSat, avgVal);
         }
     }
 }

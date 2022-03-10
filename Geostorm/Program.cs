@@ -1,5 +1,6 @@
 using Geostorm.Core;
 using Geostorm.Renderer;
+using Geostorm.GameData;
 
 namespace Geostorm
 {
@@ -9,19 +10,15 @@ namespace Geostorm
         {
             // ----- Initialization ----- //
 
-            const int screenWidth = 1920;
+            const int screenWidth  = 1920;
             const int screenHeight = 1080;
 
-            GameData.Game    game             = new();
+            Game             game             = new();
             RaylibController raylibController = new(screenWidth, screenHeight);
             ImguiController  imguiController  = new();
             imguiController.Load(screenWidth, screenHeight);
 
-            game.bullets.Add(new Bullet());
-            game.bullets[0].Pos = new System.Numerics.Vector2(screenWidth/2 - 100, screenHeight/2);
-
-            game.enemies.Add(new Grunt());
-            game.enemies[0].Pos = new System.Numerics.Vector2(screenWidth/2 + 100, screenHeight/2);
+            game.enemies.Add(new Grunt(new System.Numerics.Vector2(screenWidth/2 + 100, screenHeight/2), 0));
 
             // ----- Main game loop ----- //
 
@@ -30,11 +27,12 @@ namespace Geostorm
                 // ----- Update ----- //
 
                 // Get the game inputs from Raylib and update ImGui.
-                GameInputs inputs = raylibController.HandleInputs();
-                imguiController.Update(inputs.DeltaTime);
+                GameInputs gameInputs = raylibController.GetInputs();
+                GameState  gameState = raylibController.GetGameState();
+                imguiController.Update(gameState.DeltaTime);
 
                 // Update the game.
-                game.Update(inputs);
+                game.Update(gameState, gameInputs);
 
 
                 // ----- Draw ----- //

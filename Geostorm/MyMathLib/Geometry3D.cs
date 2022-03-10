@@ -2,6 +2,7 @@
 using System.Numerics;
 using static System.Math;
 using System.Diagnostics;
+using static MyMathLib.Colors;
 using static MyMathLib.Geometry2D;
 using static MyMathLib.Arithmetic;
 
@@ -13,7 +14,7 @@ namespace MyMathLib
     {
         Vector3 pos;
         Vector3 normal;
-        Color   color;
+        RGBA    color;
         Vector2 uv;
     }
 
@@ -227,14 +228,14 @@ namespace MyMathLib
         public class Vertex
         {
             public Vector3 Pos, Normal;
-            public Color   Col;
+            public RGBA    Col;
             public Vector2 UV;
 
             // Null vertex.
-            public Vertex() { Pos = Normal = Vector3Zero(); Col = new Color(); UV = Vector2Zero(); }
+            public Vertex() { Pos = Normal = Vector3Zero(); Col = new RGBA(); UV = Vector2Zero(); }
 
             // Vertex from position, normal, color and UV.
-            public Vertex(Vector3 pos, Vector3 normal, Color color, Vector2 uv) { Pos = pos; Normal = normal; Col = color; UV = uv; }
+            public Vertex(Vector3 pos, Vector3 normal, RGBA color, Vector2 uv) { Pos = pos; Normal = normal; Col = color; UV = uv; }
         }
 
 
@@ -286,7 +287,7 @@ namespace MyMathLib
                 return new Vertex(
                     new Vector3 ( (A.Pos.X    + B.Pos.X    + C.Pos.X)    / 3, (A.Pos.Y    + B.Pos.Y    + C.Pos.Y)    / 3, (A.Pos.Z    + B.Pos.Z    + C.Pos.Z)    / 3 ),
                     new Vector3 ( (A.Normal.X + B.Normal.X + C.Normal.X) / 3, (A.Normal.Y + B.Normal.Y + C.Normal.Y) / 3, (A.Normal.Z + B.Normal.Z + C.Normal.Z) / 3 ),
-                    new Color   ( (A.Col.R    + B.Col.R    + C.Col.R)    / 3, (A.Col.G    + B.Col.G    + C.Col.G)    / 3, (A.Col.B    + B.Col.B    + C.Col.B)    / 3, (A.Col.A + B.Col.A + C.Col.A) / 3 ),
+                    new RGBA    ( (A.Col.R    + B.Col.R    + C.Col.R)    / 3, (A.Col.G    + B.Col.G    + C.Col.G)    / 3, (A.Col.B    + B.Col.B    + C.Col.B)    / 3, (A.Col.A + B.Col.A + C.Col.A) / 3 ),
                     new Vector2 ( (A.UV.X     + B.UV.X     + C.UV.X)     / 3, (A.UV.Y     + B.UV.Y     + C.UV.Y)     / 3 )
                 ); 
             }

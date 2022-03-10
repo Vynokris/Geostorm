@@ -12,15 +12,15 @@ namespace MyMathLib
     public static class Collisions2D
     {
         // Returns the smallest rectangle that contanins the given shape.
-        public static Rectangle2 GetBoundingBox(ShapeInfo shape)
+        public static Rectangle2 GetBoundingBox<T>(in T shape) where T : IShape
         {
             // If the shape is a circle.
-            if (shape.Type == ShapeTypes.Circle)
+            if (shape.GetType() == typeof(Circle2))
             {
-                return new Rectangle2(shape.Data.circle.O.X - shape.Data.circle.Radius, 
-                                      shape.Data.circle.O.Y - shape.Data.circle.Radius, 
-                                      shape.Data.circle.Radius * 2, 
-                                      shape.Data.circle.Radius * 2);
+                return new Rectangle2(shape.GetCenterOfMass().X - shape.InscribedCircleRadius(), 
+                                      shape.GetCenterOfMass().Y - shape.InscribedCircleRadius(), 
+                                      shape.InscribedCircleRadius() * 2, 
+                                      shape.InscribedCircleRadius() * 2);
             }
 
             // Get the shape's vertices information.
@@ -48,13 +48,13 @@ namespace MyMathLib
             }
 
             // Create the shape's bounding box.
-            Rectangle2 bounding_box = new Rectangle2(Xmin, Ymin, Xmax - Xmin, Ymax - Ymin);
+            Rectangle2 bounding_box = new(Xmin, Ymin, Xmax - Xmin, Ymax - Ymin);
 
             return bounding_box;
         }
 
         // Returns an axis that passes through the center of the given circle and the center of the given shape.
-        public static Segment2 CircleGetAxis(Circle2 circle, ShapeInfo shape)
+        public static Segment2 CircleGetAxis<T>(in Circle2 circle, in T shape) where T : IShape
         {
             // Make a segment that starts at the center of the circle, goes in the direction of the center of the shape and is of length 1.
             return new Segment2(circle.O,
@@ -62,7 +62,7 @@ namespace MyMathLib
         }
 
         // Returns the axis of the given shapes that corresponds to the given index.
-        public static Segment2 ShapesGetAxis(ShapeInfo shape1, ShapeInfo shape2, int index)
+        public static Segment2 ShapesGetAxis<T1, T2>(in T1 shape1, in T2 shape2, in int index) where T1 : IShape where T2 : IShape
         {
             Debug.Assert(index < shape1.GetSidesNum() + shape2.GetSidesNum());
 
@@ -73,28 +73,30 @@ namespace MyMathLib
             if (index < shape1.GetSidesNum())
             {
                 // If the first shape is not a circle, get the side pointed to by the index and calculate its normal.
-                if (shape1.Type != ShapeTypes.Circle) {
+                if (shape1.GetType() != typeof(Circle2)) 
+                {
                     side = shape1.GetSide(index);
                     axis = new Segment2((side.A + side.A) / 2,
                                          Vector2FromSegment(side).GetNormalized().GetNormal(), true);
                 }
                 // If the first shape is a circle, get its axis.
                 else { 
-                    axis = CircleGetAxis(shape1.Data.circle, shape2);
+                    axis = CircleGetAxis(shape1 as Circle2, shape2);
                 }
             }
             // If the given index refers to an axis of the second shape...
             else
             {
                 // If the second shape is not a circle, get the side pointed to by the index and calculate its normal.
-                if (shape2.Type != ShapeTypes.Circle) {
+                if (shape2.GetType() != typeof(Circle2)) 
+                {
                     side = shape2.GetSide(index - shape1.GetSidesNum());
                     axis = new Segment2((side.A + side.B) / 2,
                                          Vector2FromSegment(side).GetNormalized().GetNormal(), true);
                 }
                 // If the second shape is a circle, get its axis.
                 else { 
-                    axis = CircleGetAxis(shape2.Data.circle, shape1);
+                    axis = CircleGetAxis(shape2 as Circle2, shape1);
                 }
             }
 
@@ -102,19 +104,19 @@ namespace MyMathLib
         }
 
         // Returns true if the given point is colliding with the given circle.
-        public static bool CollisionCirclePoint(Circle2 c, Vector2 p)
+        public static bool CollisionCirclePoint(in Circle2 c, in Vector2 p)
         {
             return Vector2FromPoints(c.O, p).Length() <= c.Radius;
         }
 
         // Returns true if the given circles are in collision.
-        public static bool CollisionCircles(Circle2 c1, Circle2 c2)
+        public static bool CollisionCircles(in Circle2 c1, in Circle2 c2)
         {
             return Vector2FromPoints(c1.O, c2.O).Length() <= c1.Radius + c2.Radius;
         }
 
         // Checks for collision between two rectangles.
-        public static bool CollisionAABB(Rectangle2 rec1, Rectangle2 rec2)
+        public static bool CollisionAABB(in Rectangle2 rec1, in Rectangle2 rec2)
         {
             if (rec1.O.X + rec1.W >= rec2.O.X &&
                 rec1.O.X <= rec2.O.X + rec2.W &&
@@ -130,20 +132,20 @@ namespace MyMathLib
         }
 
         // Project a shape onto a given axis.
-        public static Segment2 ProjectShapeOnAxis(Segment2 axis, ShapeInfo shape)
+        public static Segment2 ProjectShapeOnAxis<T>(in Segment2 axis, in T shape) where T : IShape
         {
             // Get the axis' vector.
             Vector2 axis_vec = Vector2FromSegment(axis);
 
             // Handle circles.
-            if (shape.Type == ShapeTypes.Circle)
+            if (shape.GetType() == typeof(Circle2))
             {
                 // Project the circle's origin onto the axis.
-                Vector2 origin_projection = axis.A + axis_vec * Vector2FromPoints(axis.A, shape.Data.circle.O).Dot(axis_vec);
+                Vector2 origin_projection = axis.A + axis_vec * Vector2FromPoints(axis.A, shape.GetCenterOfMass()).Dot(axis_vec);
 
                 // Create a segment of the circle's projection.
-                Segment2 circle_projection = new Segment2(origin_projection - axis_vec * shape.Data.circle.Radius,
-                                                          origin_projection + axis_vec * shape.Data.circle.Radius);
+                Segment2 circle_projection = new(origin_projection - axis_vec * shape.InscribedCircleRadius(),
+                                                 origin_projection + axis_vec * shape.InscribedCircleRadius());
         
                 return circle_projection;
             }
@@ -189,7 +191,7 @@ namespace MyMathLib
         }
 
         // Returns true if the given point is colliding with the given segment.
-        public static bool CollisionSegmentPoint(Segment2 segment, Vector2 point)
+        public static bool CollisionSegmentPoint(in Segment2 segment, in Vector2 point)
         {
             if (RoundInt(Vector2FromSegment(segment).Cross(Vector2FromPoints(segment.A, point))) == 0)
             {
@@ -203,7 +205,7 @@ namespace MyMathLib
         }
 
         // Returns true if the given projections are colliding each others
-        public static bool CollisionProjections(Segment2 projection1, Segment2 projection2)
+        public static bool CollisionProjections(in Segment2 projection1, in Segment2 projection2)
         {
             if (CollisionSegmentPoint(projection1, projection2.A) ||
                 CollisionSegmentPoint(projection1, projection2.B) ||
@@ -216,15 +218,15 @@ namespace MyMathLib
         }
 
         // Checks for collision between two given shapes.
-        public static bool CollisionSAT(ShapeInfo shape1, ShapeInfo shape2)
+        public static bool CollisionSAT<T1, T2>(in T1 shape1, in T2 shape2) where T1 : IShape where T2 : IShape
         {
             // If both shapes are circles, don't use SAT.
-            if (shape1.Type == ShapeTypes.Circle && shape2.Type == ShapeTypes.Circle)
-                return CollisionCircles(shape1.Data.circle, shape2.Data.circle);
+            if (shape1.GetType() == typeof(Circle2) && shape2.GetType() == typeof(Circle2))
+                return CollisionCircles(shape1 as Circle2, shape2 as Circle2);
 
             // If both shapes are rectangles, don't use SAT.
-            else if (shape1.Type == ShapeTypes.Rectangle && shape2.Type == ShapeTypes.Rectangle)
-                return CollisionAABB(shape1.Data.rectangle, shape2.Data.rectangle);
+            else if (shape1.GetType() == typeof(Rectangle2) && shape2.GetType() == typeof(Rectangle2))
+                return CollisionAABB(shape1 as Rectangle2, shape2 as Rectangle2);
 
             // Check for collisions on the shapes' bounding boxes to not have to check if they are not in collision.
             else if (CollisionAABB(GetBoundingBox(shape1), GetBoundingBox(shape2)))
