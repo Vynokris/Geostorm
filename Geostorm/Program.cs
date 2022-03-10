@@ -13,7 +13,7 @@ namespace Geostorm
             const int screenWidth  = 1920;
             const int screenHeight = 1080;
 
-            Game             game             = new();
+            Game             game             = new(screenWidth, screenHeight);
             RaylibController raylibController = new(screenWidth, screenHeight);
             ImguiController  imguiController  = new();
             imguiController.Load(screenWidth, screenHeight);
