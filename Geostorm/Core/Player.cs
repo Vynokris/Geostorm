@@ -11,7 +11,7 @@ namespace Geostorm.Core
     {
         public int Score { get; private set; }  = 0;
         private readonly Cooldown ShootCooldown = new(5);
-        private readonly Cooldown DashCooldown  = new(60);
+        private readonly Cooldown DashCooldown  = new(10);
         private readonly Cooldown DashingFrames = new(15);
         public  readonly Cooldown Invincibility = new(60*3);
         private readonly int MaxVelocity        = 10;
@@ -88,6 +88,28 @@ namespace Geostorm.Core
 
             // Move the player according to its velocity.
             Pos += Velocity;
+
+            // -- Stop at screen borders -- //
+            if (Pos.X < 25)
+            {
+                Pos      = new Vector2(25, Pos.Y);
+                Velocity = new Vector2(ClampAbove(Velocity.X, 0), Velocity.Y);
+            }
+            if (Pos.X > gameState.ScreenSize.X-25) 
+            {
+                Pos      = new Vector2(gameState.ScreenSize.X-25, Pos.Y);
+                Velocity = new Vector2(ClampUnder(Velocity.X, 0), Velocity.Y);
+            }
+            if (Pos.Y < 25)
+            {
+                Pos      = new Vector2(Pos.X, 25);
+                Velocity = new Vector2(Velocity.X, ClampAbove(Velocity.Y, 0));
+            }
+            if (Pos.Y > gameState.ScreenSize.Y-25)
+            {
+                Pos      = new Vector2(Pos.X, gameState.ScreenSize.Y-25);
+                Velocity = new Vector2(Velocity.X, ClampUnder(Velocity.Y, 0));
+            }
         }
 
         public void Shoot(ref List<Bullet> bullets)

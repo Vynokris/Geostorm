@@ -98,7 +98,7 @@ namespace MyMathLib
         }
 
         // Rotates the given vector by the given angle.
-        public static Vector2 GetRotated(ref this Vector2 v, in float angle)
+        public static Vector2 GetRotated(this Vector2 v, in float angle)
         {
             float vLength = v.Length();
             float vAngle = v.GetAngle();
@@ -129,7 +129,8 @@ namespace MyMathLib
         public static Vector2 GetRotatedAsPoint(in this Vector2 point, in float angle, in Vector2 origin)
         {
             Vector2 origToPoint = Vector2FromPoints(origin, point);
-            origToPoint.Rotate(angle);
+            if (origToPoint.Length() > 0)
+                origToPoint.Rotate(angle);
             return origin + origToPoint;
         }
         
