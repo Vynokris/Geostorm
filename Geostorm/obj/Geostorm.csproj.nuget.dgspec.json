@@ -1,20 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\r.serra\\Documents\\GP1\\CsProjects\\Geostorm\\Geostorm\\Geostorm.csproj": {}
+    "D:\\Documents\\Work\\ISART Digital\\GP1\\Geostorm\\Geostorm\\Geostorm.csproj": {}
   },
   "projects": {
-    "C:\\Users\\r.serra\\Documents\\GP1\\CsProjects\\Geostorm\\Geostorm\\Geostorm.csproj": {
+    "D:\\Documents\\Work\\ISART Digital\\GP1\\Geostorm\\Geostorm\\Geostorm.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\r.serra\\Documents\\GP1\\CsProjects\\Geostorm\\Geostorm\\Geostorm.csproj",
+        "projectUniqueName": "D:\\Documents\\Work\\ISART Digital\\GP1\\Geostorm\\Geostorm\\Geostorm.csproj",
         "projectName": "Geostorm",
-        "projectPath": "C:\\Users\\r.serra\\Documents\\GP1\\CsProjects\\Geostorm\\Geostorm\\Geostorm.csproj",
-        "packagesPath": "C:\\Users\\r.serra\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\r.serra\\Documents\\GP1\\CsProjects\\Geostorm\\Geostorm\\obj\\",
+        "projectPath": "D:\\Documents\\Work\\ISART Digital\\GP1\\Geostorm\\Geostorm\\Geostorm.csproj",
+        "packagesPath": "C:\\Users\\remis\\.nuget\\packages\\",
+        "outputPath": "D:\\Documents\\Work\\ISART Digital\\GP1\\Geostorm\\Geostorm\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\r.serra\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\remis\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -64,7 +67,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.301\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }

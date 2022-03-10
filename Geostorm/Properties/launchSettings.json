@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Geostorm": {
+      "commandName": "Project",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
