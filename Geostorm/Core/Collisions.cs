@@ -12,8 +12,10 @@ namespace Geostorm.Core
         {
             foreach (Enemy enemy in enemies)
             {
-                if (player.Invincibility.HasEnded() && CheckEntityCollisions(player, enemy, entityVertices)) { 
-                    // TODO
+                if (player.Invincibility.HasEnded() && CheckEntityCollisions(player, enemy, entityVertices)) 
+                { 
+                    player.Invincibility.Reset();
+                    player.Health--;
                 }
                 
                 foreach (Bullet bullet in bullets)

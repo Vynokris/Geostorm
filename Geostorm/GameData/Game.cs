@@ -52,13 +52,15 @@ namespace Geostorm.GameData
                 player.Shoot(ref bullets);
         }
 
-        public void Draw(in RaylibController raylibController)
+        public void Draw(in GraphicsController graphicsController)
         {
-            raylibController.DrawEntity(player, entityVertices);
-            if (!player.Invincibility.HasEnded())
-                raylibController.DrawPlayerShield(player.Pos, player.Invincibility.Counter);
-            foreach(Enemy  enemy  in enemies) raylibController.DrawEntity(enemy, entityVertices);
-            foreach(Bullet bullet in bullets) raylibController.DrawEntity(bullet, entityVertices);
+            // Draw the enemies and bullets.
+            foreach(Enemy  enemy  in enemies) graphicsController.DrawEntity(enemy, entityVertices);
+            foreach(Bullet bullet in bullets) graphicsController.DrawEntity(bullet, entityVertices);
+
+            // Draw the player and its invincibility shield.
+            graphicsController.DrawEntity(player, entityVertices);
+            graphicsController.DrawPlayerShield(player.Pos, player.Invincibility.Counter);
         }
     }
 }

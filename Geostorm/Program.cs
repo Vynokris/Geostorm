@@ -13,9 +13,9 @@ namespace Geostorm
             const int screenWidth  = 1920;
             const int screenHeight = 1080;
 
-            Game             game             = new(screenWidth, screenHeight);
-            RaylibController raylibController = new(screenWidth, screenHeight);
-            ImguiController  imguiController  = new();
+            Game               game             = new(screenWidth, screenHeight);
+            GraphicsController graphicsController = new(screenWidth, screenHeight);
+            ImguiController    imguiController  = new();
             imguiController.Load(screenWidth, screenHeight);
 
             game.enemies.Add(new Grunt   (new System.Numerics.Vector2(screenWidth - 100, screenHeight/2), 0));
@@ -23,13 +23,13 @@ namespace Geostorm
 
             // ----- Main game loop ----- //
 
-            while (!raylibController.WindowShouldClose())
+            while (!graphicsController.WindowShouldClose())
             {
                 // ----- Update ----- //
 
                 // Get the game inputs from Raylib and update ImGui.
-                GameInputs gameInputs = raylibController.GetInputs();
-                GameState  gameState = raylibController.GetGameState();
+                GameInputs gameInputs = graphicsController.GetInputs();
+                GameState  gameState = graphicsController.GetGameState();
                 imguiController.Update(gameState.DeltaTime);
 
                 // Update the game.
@@ -38,20 +38,20 @@ namespace Geostorm
 
                 // ----- Draw ----- //
 
-                raylibController.BeginDrawing();
+                graphicsController.BeginDrawing();
 
-                game.Draw(raylibController);
+                game.Draw(graphicsController);
 
                 imguiController.Draw();
 
-                raylibController.EndDrawing();
+                graphicsController.EndDrawing();
             }
 
 
             // ----- DeInitialization ----- //
 
             imguiController.Dispose();
-            raylibController.Dispose();
+            graphicsController.Dispose();
         }
     }
 }
