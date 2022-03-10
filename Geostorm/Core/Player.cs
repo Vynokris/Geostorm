@@ -18,6 +18,7 @@ namespace Geostorm.Core
         private readonly int DashVelocity       = 50;
 
         public Player() { DashingFrames.Counter = 0; }
+        public Player(Vector2 pos) : base(pos, Vector2Zero(), 0, 3) { }
         public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity, rotation, 3) { }
 
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)

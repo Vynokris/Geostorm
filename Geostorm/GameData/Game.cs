@@ -1,7 +1,7 @@
 ﻿using Geostorm.Core;
 using Geostorm.Renderer;
-using System;
 using System.Collections.Generic;
+using static MyMathLib.Geometry2D;
 
 namespace Geostorm.GameData
 {
@@ -11,6 +11,11 @@ namespace Geostorm.GameData
         public List<Enemy> enemies  = new();
         public List<Bullet> bullets = new();
         public readonly EntityVertices entityVertices = new();
+
+        public Game(in int screenW, in int screenH)
+        {
+            player = new(Vector2Create(screenW/2, screenH/2));
+        }
 
         public void Update(GameState gameState, GameInputs gameInputs)
         {
