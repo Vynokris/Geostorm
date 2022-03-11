@@ -7,18 +7,24 @@ namespace Geostorm.GameData
 {
     public class Game
     {
-        public Player player        = new();
+        public double GameDuration = 0;
+        public Player player;
         public List<Enemy> enemies  = new();
         public List<Bullet> bullets = new();
+        public EnemySpawner spawner;
         public readonly EntityVertices entityVertices = new();
 
         public Game(in int screenW, in int screenH)
         {
-            player = new(Vector2Create(screenW/2, screenH/2));
+            player  = new(Vector2Create(screenW/2, screenH/2));
+            spawner = new(screenW, screenH);
         }
 
         public void Update(GameState gameState, GameInputs gameInputs)
         {
+            // Update the game duration.
+            GameDuration += gameState.DeltaTime;
+
             // Reset the gameEvents to be give it to all entitites.
             GameEvents gameEvents = new();
 
@@ -31,6 +37,10 @@ namespace Geostorm.GameData
             // Update the player.
             player.Update(gameState, gameInputs, ref gameEvents);
 
+            // Add a bullet if the player is shooting.
+            if (gameEvents.PlayerShooting)
+                player.Shoot(ref bullets);
+
             // Update the bullets.
             for (int i = bullets.Count-1; i >= 0; i--) 
             {
@@ -39,6 +49,9 @@ namespace Geostorm.GameData
                     bullets.Remove(bullets[i]);
             }
 
+            // Update the enemy spawner.
+            spawner.Update(ref enemies, GameDuration);
+
             // Update the enemies.
             for (int i = enemies.Count-1; i >= 0; i--)
             {
@@ -46,10 +59,6 @@ namespace Geostorm.GameData
                 if (enemies[i].Health <= 0)
                     enemies.Remove(enemies[i]);
             }
-
-            // Add a bullet if the player is shooting.
-            if (gameEvents.PlayerShooting)
-                player.Shoot(ref bullets);
         }
 
         public void Draw(in GraphicsController graphicsController)
@@ -61,6 +70,7 @@ namespace Geostorm.GameData
             // Draw the player and its invincibility shield.
             graphicsController.DrawEntity(player, entityVertices);
             graphicsController.DrawPlayerShield(player.Pos, player.Invincibility.Counter);
+            graphicsController.DrawCursor(entityVertices, enemies);
         }
     }
 }

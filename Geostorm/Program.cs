@@ -10,12 +10,13 @@ namespace Geostorm
         {
             // ----- Initialization ----- //
 
-            const int screenWidth  = 1920;
-            const int screenHeight = 1080;
+            GraphicsController graphicsController = new();
+            ImguiController    imguiController    = new();
 
-            Game               game             = new(screenWidth, screenHeight);
-            GraphicsController graphicsController = new(screenWidth, screenHeight);
-            ImguiController    imguiController  = new();
+            int screenWidth  = graphicsController.ScreenWidth;
+            int screenHeight = graphicsController.ScreenHeight;
+
+            Game game = new(screenWidth, screenHeight);
             imguiController.Load(screenWidth, screenHeight);
 
             game.enemies.Add(new Grunt   (new System.Numerics.Vector2(screenWidth - 100, screenHeight/2), 0));
@@ -27,23 +28,22 @@ namespace Geostorm
             {
                 // ----- Update ----- //
 
-                // Get the game inputs from Raylib and update ImGui.
+                // Get the game inputs and game state.
                 GameInputs gameInputs = graphicsController.GetInputs();
-                GameState  gameState = graphicsController.GetGameState();
-                imguiController.Update(gameState.DeltaTime);
+                GameState  gameState  = graphicsController.GetGameState();
 
-                // Update the game.
+                // Update imgui and the game.
+                imguiController.Update(gameState.DeltaTime);
                 game.Update(gameState, gameInputs);
 
 
                 // ----- Draw ----- //
 
                 graphicsController.BeginDrawing();
-
-                game.Draw(graphicsController);
-
-                imguiController.Draw();
-
+                { 
+                    game.Draw(graphicsController);
+                    imguiController.Draw();
+                }
                 graphicsController.EndDrawing();
             }
 
