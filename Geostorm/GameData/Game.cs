@@ -20,7 +20,7 @@ namespace Geostorm.GameData
 
         public Game(in int screenW, in int screenH)
         {
-            player  = new(Vector2Create(screenW/2, screenH/2));
+            player  = new(Vector2Create(screenW/2, screenH/2), Vector2Zero(), 2);
             spawner = new(screenW, screenH);
 
             int StarsCount = 100;

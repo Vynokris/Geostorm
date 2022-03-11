@@ -64,11 +64,11 @@ namespace Geostorm.Core
             }
 
             // -- Turn -- //
-            if (gameInputs.ShootDir != Vector2Zero())
+            if (gameInputs.ShootDir.Length() > 0f)
             {
                 Rotation = gameInputs.ShootDir.GetAngle();
             }
-            else
+            else if (gameInputs.ShootTarget != Vector2Create(-1, -1))
             {
                 Rotation = Vector2FromPoints(Pos, gameInputs.ShootTarget).GetAngle();
             }
