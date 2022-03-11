@@ -36,7 +36,7 @@ namespace Geostorm.Renderer
         {
             // Create a new raylib window.
             Raylib.SetTraceLogCallback(&Logging.LogConsole);
-            Raylib.SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT | ConfigFlags.FLAG_VSYNC_HINT | ConfigFlags.FLAG_WINDOW_RESIZABLE);
+            Raylib.SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT | ConfigFlags.FLAG_VSYNC_HINT | ConfigFlags.FLAG_WINDOW_UNDECORATED);
             Raylib.InitWindow(ScreenWidth, ScreenHeight, "Geostorm");
             Raylib.SetTargetFPS(60);
 

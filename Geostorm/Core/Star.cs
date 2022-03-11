@@ -1,7 +1,10 @@
 ﻿using System.Numerics;
+using System.Collections.Generic;
+
 using static System.MathF;
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Colors;
+
 using Geostorm.GameData;
 
 namespace Geostorm.Core
@@ -32,7 +35,7 @@ namespace Geostorm.Core
             Color.B += minVal;
         }
 
-        public override void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
+        public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Move the star according to its velocity.
             Pos += Velocity;

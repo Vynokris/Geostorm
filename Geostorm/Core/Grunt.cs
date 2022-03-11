@@ -1,5 +1,8 @@
 ﻿using System.Numerics;
+using System.Collections.Generic;
+
 using static MyMathLib.Geometry2D;
+
 using Geostorm.GameData;
 
 namespace Geostorm.Core
@@ -9,7 +12,7 @@ namespace Geostorm.Core
         public Grunt() { }
         public Grunt(Vector2 pos, int spawnDelay) : base(pos, 1, spawnDelay) { }
 
-        public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
+        public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Make the grunt move towards the player.
             Velocity = Velocity.GetModifiedAngle(Vector2FromPoints(Pos, gameState.PlayerPos).GetAngle());

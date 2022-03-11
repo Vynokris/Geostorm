@@ -1,6 +1,9 @@
-﻿using static System.MathF;
-using System.Numerics;
+﻿using System.Numerics; 
+using System.Collections.Generic;
+
+using static System.MathF;
 using static MyMathLib.Geometry2D;
+
 using Geostorm.GameData;
 
 namespace Geostorm.Core
@@ -10,7 +13,7 @@ namespace Geostorm.Core
         public Wanderer() { }
         public Wanderer(Vector2 pos, int spawnDelay) : base(pos, 1, spawnDelay) { }
 
-        public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
+        public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Roatate the wanderer.
             Rotation += PI/30;
