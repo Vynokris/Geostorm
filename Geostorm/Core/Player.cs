@@ -8,10 +8,10 @@ using Geostorm.GameData;
 
 namespace Geostorm.Core
 {
-    public class Player : Entity
+    public class Player : Entity, IEventListener
     {
         private readonly Cooldown ShootCooldown = new(5);
-        private readonly Cooldown DashCooldown  = new(10);
+        private readonly Cooldown DashCooldown  = new(20);
         private readonly Cooldown DashingFrames = new(15);
         public  readonly Cooldown Invincibility = new(60*3);
         private readonly int MaxVelocity        = 10;
@@ -21,7 +21,7 @@ namespace Geostorm.Core
         public Player(Vector2 pos)                                   : base(pos, Vector2Zero(), 0,        3) { }
         public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity,      rotation, 3) { }
 
-        public override void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
+        public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Update the player's cooldowns.
             ShootCooldown.Update();
@@ -33,7 +33,7 @@ namespace Geostorm.Core
             if (gameInputs.Movement != Vector2Zero())
             {
                 // Update the game events.
-                gameEvents.PlayerMoving = true;
+                gameEvents.Add(new PlayerMoveEvent(Pos));
 
                 // Get the direction of the joystick.
                 float dirAngle = gameInputs.Movement.GetAngle();
@@ -73,17 +73,22 @@ namespace Geostorm.Core
                 Rotation = Vector2FromPoints(Pos, gameInputs.ShootTarget).GetAngle();
             }
 
-            // -- Shoot -- //
-            if (gameInputs.Shoot)
+            // -- Shoot events -- //
+            if (gameInputs.Shoot && ShootCooldown.HasEnded())
             {
-                gameEvents.PlayerShooting = true;
+                gameEvents.Add(new PlayerShootEvent(new Bullet(Pos + Vector2FromAngle(Rotation, -6).GetNormal() 
+                                                                   + Vector2FromAngle(Rotation, 21), Rotation)));
+                gameEvents.Add(new PlayerShootEvent(new Bullet(Pos + Vector2FromAngle(Rotation,  6).GetNormal() 
+                                                                   + Vector2FromAngle(Rotation, 21), Rotation)));
+                ShootCooldown.Reset();
             }
 
-            // -- Dash -- //
-            if (gameInputs.Dash)
+            // -- Dash event -- //
+            if (gameInputs.Dash && DashCooldown.HasEnded())
             {
-                gameEvents.PlayerDashing = true;
-                Dash();
+                gameEvents.Add(new PlayerDashEvent());
+                DashCooldown.Reset();
+                DashingFrames.Reset();
             }
 
             // Move the player according to its velocity.
@@ -112,22 +117,15 @@ namespace Geostorm.Core
             }
         }
 
-        public void Shoot(ref List<Bullet> bullets)
+        public void HandleEvents(in List<GameEvent> gameEvents)
         {
-            if (ShootCooldown.HasEnded())
+            foreach (GameEvent Event in gameEvents)
             {
-                ShootCooldown.Reset();
-                bullets.Add(new Bullet(Pos + Vector2FromAngle(Rotation, -6).GetNormal() + Vector2FromAngle(Rotation, 21), Rotation));
-                bullets.Add(new Bullet(Pos + Vector2FromAngle(Rotation,  6).GetNormal() + Vector2FromAngle(Rotation, 21), Rotation));
-            }
-        }
-
-        public void Dash()
-        {
-            if (DashCooldown.HasEnded())
-            {
-                DashCooldown.Reset();
-                DashingFrames.Reset();
+                if (Event.GetType() == typeof(PlayerDamagedEvent)) {
+                    Health -= 1;
+                    Invincibility.Reset();
+                    break;
+                }
             }
         }
     }

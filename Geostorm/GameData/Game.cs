@@ -5,7 +5,7 @@ using static MyMathLib.Geometry2D;
 
 namespace Geostorm.GameData
 {
-    public class Game
+    public class Game : IEventListener
     {
         public double GameDuration = 0;
         public int    Score        = 0;
@@ -34,7 +34,7 @@ namespace Geostorm.GameData
             GameDuration += gameState.DeltaTime;
 
             // Reset the gameEvents to be give it to all entitites.
-            GameEvents gameEvents = new();
+            List<GameEvent> gameEvents = new();
 
             // Update the game state with entity information.
             gameState.PlayerPos    = player.Pos;
@@ -42,7 +42,7 @@ namespace Geostorm.GameData
             gameState.Score        = Score;
 
             // Update the entity collisions.
-            Collisions.DoCollisions(ref player, ref bullets, ref enemies, entityVertices);
+            Collisions.DoCollisions(player, bullets, enemies, entityVertices, ref gameEvents);
 
             // Update the stars.
             foreach (Star star in stars)
@@ -50,10 +50,6 @@ namespace Geostorm.GameData
 
             // Update the player.
             player.Update(gameState, gameInputs, ref gameEvents);
-
-            // Add a bullet if the player is shooting.
-            if (gameEvents.PlayerShooting)
-                player.Shoot(ref bullets);
 
             // Update the bullets.
             for (int i = bullets.Count-1; i >= 0; i--) 
@@ -63,15 +59,46 @@ namespace Geostorm.GameData
                     bullets.Remove(bullets[i]);
             }
 
-            // Update the enemy spawner.
-            spawner.Update(ref enemies, GameDuration);
-
             // Update the enemies.
             for (int i = enemies.Count-1; i >= 0; i--)
             {
                 enemies[i].Update(gameState, gameInputs, ref gameEvents);
                 if (enemies[i].Health <= 0)
                     enemies.Remove(enemies[i]);
+            }
+
+            // Update the enemy spawner.
+            spawner.Update(ref gameEvents, GameDuration);
+
+            // Handle game events.
+            HandleEvents(gameEvents);
+            player.HandleEvents(gameEvents);
+            foreach(Enemy enemy in enemies) enemy.HandleEvents(gameEvents);
+        }
+
+        public void HandleEvents(in List<GameEvent> gameEvents)
+        {
+            foreach (GameEvent Event in gameEvents)
+            {
+                if (Event is PlayerShootEvent shootEvent) {
+                    bullets.Add(shootEvent.bullet);
+                }
+
+                else if (Event.GetType() == typeof(PlayerKilledEvent)) {
+                    // TODO: GAME OVER.
+                }
+
+                else if (Event is EnemySpawnedEvent spawnEvent) {
+                    enemies.Add(spawnEvent.enemy);
+                }
+
+                else if (Event is EnemyDamagedEvent damageEvent) {
+                    bullets.Remove(damageEvent.bullet);
+                }
+
+                else if (Event is EnemyKilledEvent killEvent) {
+                    enemies.Remove(killEvent.enemy);
+                }
             }
         }
 

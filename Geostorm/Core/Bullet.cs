@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Collections.Generic;
 using static MyMathLib.Geometry2D;
 using Geostorm.GameData;
 
@@ -9,7 +10,7 @@ namespace Geostorm.Core
         public Bullet() { }
         public Bullet(Vector2 pos, float rotation) : base(pos, Vector2FromAngle(rotation, 20), rotation, 1) { }
 
-        public override void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
+        public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Move the bullet according to its velocity.
             Pos += Velocity;

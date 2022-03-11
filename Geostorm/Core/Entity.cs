@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Collections.Generic;
 using static MyMathLib.Geometry2D;
 using static MyMathLib.Colors;
 using Geostorm.GameData;
@@ -22,6 +23,6 @@ namespace Geostorm.Core
 
         public Entity() { }
         public Entity(Vector2 pos, Vector2 velocity, float rotation, float health) { Pos = pos; Velocity = velocity; Rotation = rotation; Health = health; }
-        public abstract void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents);
+        public abstract void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents);
     }
 }

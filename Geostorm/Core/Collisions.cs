@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using static MyMathLib.Geometry2D;
 using static MyMathLib.Collisions2D;
 using Geostorm.Renderer;
+using Geostorm.GameData;
 
 namespace Geostorm.Core
 {
     public static class Collisions
     {
-        public static void DoCollisions(ref Player player, ref List<Bullet> bullets, ref List<Enemy> enemies, in EntityVertices entityVertices)
+        public static void DoCollisions(in Player player, in List<Bullet> bullets, in List<Enemy> enemies, in EntityVertices entityVertices, ref List<GameEvent> gameEvents)
         {
             foreach (Enemy enemy in enemies)
             {
@@ -17,8 +18,13 @@ namespace Geostorm.Core
                     // Check collisions between player and enemies.
                     if (player.Invincibility.HasEnded() && CheckEntityCollisions(player, enemy, entityVertices)) 
                     { 
+                        /*
                         player.Invincibility.Reset();
                         player.Health--;
+                        */
+                        gameEvents.Add(new PlayerDamagedEvent());
+                        if (player.Health <= 1)
+                            gameEvents.Add(new PlayerKilledEvent());
                     }
                     
                     // Check collisions between bullets and enemies.
@@ -26,8 +32,13 @@ namespace Geostorm.Core
                     {
                         if (CheckEntityCollisions(bullet, enemy, entityVertices)) 
                         {
+                            /*
                             enemy.Health -= 1;
                             bullet.Health = 0;
+                            */
+                            gameEvents.Add(new EnemyDamagedEvent(enemy, bullet));
+                            if (enemy.Health <= 1)
+                                gameEvents.Add(new EnemyKilledEvent(enemy));
                         }
                     }
                 }
