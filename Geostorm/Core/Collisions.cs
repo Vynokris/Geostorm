@@ -12,18 +12,23 @@ namespace Geostorm.Core
         {
             foreach (Enemy enemy in enemies)
             {
-                if (player.Invincibility.HasEnded() && CheckEntityCollisions(player, enemy, entityVertices)) 
+                if (enemy.SpawnDelay.Counter <= 0)
                 { 
-                    player.Invincibility.Reset();
-                    player.Health--;
-                }
-                
-                foreach (Bullet bullet in bullets)
-                {
-                    if (CheckEntityCollisions(bullet, enemy, entityVertices)) 
+                    // Check collisions between player and enemies.
+                    if (player.Invincibility.HasEnded() && CheckEntityCollisions(player, enemy, entityVertices)) 
+                    { 
+                        player.Invincibility.Reset();
+                        player.Health--;
+                    }
+                    
+                    // Check collisions between bullets and enemies.
+                    foreach (Bullet bullet in bullets)
                     {
-                        enemy.Health -= 1;
-                        bullet.Health = 0;
+                        if (CheckEntityCollisions(bullet, enemy, entityVertices)) 
+                        {
+                            enemy.Health -= 1;
+                            bullet.Health = 0;
+                        }
                     }
                 }
             }

@@ -64,7 +64,13 @@ namespace Geostorm.GameData
         public void Draw(in GraphicsController graphicsController)
         {
             // Draw the enemies and bullets.
-            foreach(Enemy  enemy  in enemies) graphicsController.DrawEntity(enemy, entityVertices);
+            foreach(Enemy  enemy  in enemies) 
+            {
+                if (enemy.SpawnDelay.Counter <= 0)
+                    graphicsController.DrawEntity(enemy, entityVertices);
+                else
+                    graphicsController.DrawLines(entityVertices.GetEntitySpawnAnimation(enemy, enemy.SpawnDelay), entityVertices.GetEntityColor(enemy));
+            }
             foreach(Bullet bullet in bullets) graphicsController.DrawEntity(bullet, entityVertices);
 
             // Draw the player and its invincibility shield.

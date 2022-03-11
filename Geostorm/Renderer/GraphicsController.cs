@@ -45,7 +45,7 @@ namespace Geostorm.Renderer
             ScreenWidth  = Raylib.GetMonitorWidth(0);
             ScreenHeight = Raylib.GetMonitorHeight(0);
             Raylib.SetWindowSize(ScreenWidth, ScreenHeight);
-            Raylib.ToggleFullscreen();
+            Raylib.SetWindowPosition(0, 0);
 
             // Load shaders.
             GaussianBlurShader        = Raylib.LoadShader(null, "Shaders/GaussianBlur.fs");
@@ -240,6 +240,11 @@ namespace Geostorm.Renderer
                 Raylib.EndShaderMode();
             }
             Raylib.EndDrawing();
+        }
+
+        public void DrawLines(in Vector2[] vertices, RGBA color)
+        {
+            Raylib.DrawLineStrip(vertices, vertices.Length, new Color((int)(color.R*255.0), (int)(color.G*255.0), (int)(color.B*255.0), (int)(color.A*255.0)));
         }
 
         public void DrawEntity<T>(in T entity, in EntityVertices entityVertices) where T : IEntity

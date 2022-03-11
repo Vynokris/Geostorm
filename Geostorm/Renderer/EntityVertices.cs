@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Numerics;
-using Geostorm.Core;
+using System.Collections.Generic;
+
 using static MyMathLib.Colors;
 using static MyMathLib.Geometry2D;
+
+using Geostorm.Core;
+using Geostorm.Utility;
 
 namespace Geostorm.Renderer
 {
@@ -107,6 +111,34 @@ namespace Geostorm.Renderer
                 vertices[i] = vertices[i].GetRotatedAsPoint(entity.Rotation, Vector2Zero()) + entity.Pos;
 
             return vertices;
+        }
+
+        public Vector2[] GetEntitySpawnAnimation<T>(T entity, in Cooldown spawnDelay) where T : IEntity
+        {
+            // Get the entity's vertices and create the output vertex array.
+            Vector2[] vertices = GetEntityVertices(entity);
+            List<Vector2> output = new();
+
+            // Compute a bunch of variables to determine the state of the animation.
+            int   lineCount     = vertices.Length - 1;
+            float linesPerFrame = (float)lineCount / spawnDelay.Duration;
+            float framesPerLine = 1.0f / linesPerFrame;
+            int   finishedLines = (int)((spawnDelay.Duration - spawnDelay.Counter) * linesPerFrame);
+            float lerpFactor = ((spawnDelay.Duration-spawnDelay.Counter) - finishedLines * framesPerLine) / framesPerLine;
+
+            // Add all the lines that have already finished their animation.
+            for (int i = 0; i < finishedLines+1; i++)
+                output.Add(vertices[i]);
+
+            // Draw the line that is currently animated.
+            if (finishedLines < lineCount)
+            { 
+                Vector2 curVertex = Point2Lerp(lerpFactor, vertices[finishedLines], vertices[finishedLines+1]);
+                output.Add(curVertex);
+                Console.Write($"{lerpFactor}, {curVertex}\n");
+            }
+
+            return output.ToArray();
         }
 
         public RGBA GetEntityColor<T>(T entity) where T : IEntity
