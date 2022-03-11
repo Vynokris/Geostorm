@@ -67,6 +67,7 @@ namespace MyMathLib
         // Returns the angle (in radians) of the vector.
         public static float GetAngle(in this Vector2 v)
         {
+            if (v.Length() == 0) return 0;
             return (float)Math.CopySign(Acos(v.GetNormalized().X),
                                         Asin(v.GetNormalized().Y));
         }
