@@ -19,9 +19,6 @@ namespace Geostorm
             Game game = new(screenWidth, screenHeight);
             imguiController.Load(screenWidth, screenHeight);
 
-            game.enemies.Add(new Grunt   (new System.Numerics.Vector2(screenWidth - 100, screenHeight/2), 0));
-            game.enemies.Add(new Wanderer(new System.Numerics.Vector2(              100, screenHeight/2), 0));
-
             // ----- Main game loop ----- //
 
             while (!graphicsController.WindowShouldClose())

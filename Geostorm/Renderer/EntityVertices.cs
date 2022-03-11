@@ -119,23 +119,11 @@ namespace Geostorm.Renderer
             Vector2[] vertices = GetEntityVertices(entity);
             List<Vector2> output = new();
 
-            // Compute a bunch of variables to determine the state of the animation.
-            int   lineCount     = vertices.Length - 1;
-            float linesPerFrame = (float)lineCount / spawnDelay.Duration;
-            float framesPerLine = 1.0f / linesPerFrame;
-            int   finishedLines = (int)((spawnDelay.Duration - spawnDelay.Counter) * linesPerFrame);
-            float lerpFactor = ((spawnDelay.Duration-spawnDelay.Counter) - finishedLines * framesPerLine) / framesPerLine;
-
-            // Add all the lines that have already finished their animation.
-            for (int i = 0; i < finishedLines+1; i++)
+            // Lerp all vertices at once.
+            for (int i = 0; i < vertices.Length-1; i++)
+            {
                 output.Add(vertices[i]);
-
-            // Draw the line that is currently animated.
-            if (finishedLines < lineCount)
-            { 
-                Vector2 curVertex = Point2Lerp(lerpFactor, vertices[finishedLines], vertices[finishedLines+1]);
-                output.Add(curVertex);
-                Console.Write($"{lerpFactor}, {curVertex}\n");
+                output.Add(Point2Lerp(1-spawnDelay.CompletionRatio(), vertices[i], vertices[i+1]));
             }
 
             return output.ToArray();

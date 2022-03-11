@@ -17,8 +17,9 @@ namespace Geostorm.Core
             if (SpawnCooldown.Update())
             {
                 // TODO: change cooldown according to game duration.
-                SpawnCooldown.ChangeDuration(RandomGen.Next() % 60*2 + 60);
-                SpawnRandomEnemy(ref enemies);
+                SpawnCooldown.ChangeDuration(RandomGen.Next() % 60*2);
+                for (int i = 0; i < RandomGen.Next(1, 3); i++)
+                    SpawnRandomEnemy(ref enemies);
             }
         }
 

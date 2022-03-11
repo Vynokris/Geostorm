@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
+using static MyMathLib.Colors;
 using Geostorm.Utility;
 using Geostorm.GameData;
 
@@ -9,7 +10,6 @@ namespace Geostorm.Core
 {
     public class Player : Entity
     {
-        public int Score { get; private set; }  = 0;
         private readonly Cooldown ShootCooldown = new(5);
         private readonly Cooldown DashCooldown  = new(10);
         private readonly Cooldown DashingFrames = new(15);
@@ -17,9 +17,9 @@ namespace Geostorm.Core
         private readonly int MaxVelocity        = 10;
         private readonly int DashVelocity       = 50;
 
-        public Player() { DashingFrames.Counter = 0; }
-        public Player(Vector2 pos) : base(pos, Vector2Zero(), 0, 3) { }
-        public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity, rotation, 3) { }
+        public Player() { }
+        public Player(Vector2 pos)                                   : base(pos, Vector2Zero(), 0,        3) { }
+        public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity,      rotation, 3) { }
 
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref GameEvents gameEvents)
         {
