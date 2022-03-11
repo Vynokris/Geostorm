@@ -20,7 +20,7 @@ void main()
     // Variables proportianal to screen size.
     vec2 screenSize = vec2(screenWidth, screenHeight);
     vec2 pixelSize  = vec2(1.0) / screenSize;
-    vec2 vignette   = 600.0 * pixelSize;
+    vec2 vignette   = 1100.0 * pixelSize;
 
     // Normal and modified pixel colors.
     vec4 fragColor = texture2D(texture0, fragTexCoord);
@@ -42,7 +42,7 @@ void main()
         gl_FragColor = newColor;
     }
 
-    // If not, apply chromatic aberration depending on distance drom the center.
+    // If not, apply chromatic aberration depending on distance drom the center.    
     else
     {
         float ratio = (distCenter.x/vignette.x + distCenter.y/vignette.y) / 2.0;

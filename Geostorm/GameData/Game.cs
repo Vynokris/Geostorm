@@ -8,16 +8,24 @@ namespace Geostorm.GameData
     public class Game
     {
         public double GameDuration = 0;
-        public Player player;
-        public List<Enemy> enemies  = new();
+        public int    Score        = 0;
+
+        public Player       player;
         public List<Bullet> bullets = new();
+        public List<Star>   stars   = new();
+        public List<Enemy>  enemies = new();
         public EnemySpawner spawner;
+
         public readonly EntityVertices entityVertices = new();
 
         public Game(in int screenW, in int screenH)
         {
             player  = new(Vector2Create(screenW/2, screenH/2));
             spawner = new(screenW, screenH);
+
+            int StarsCount = 200;
+            for (int i = 0; i < StarsCount; i++)
+                stars.Add(new Star(screenW, screenH));
         }
 
         public void Update(GameState gameState, GameInputs gameInputs)
@@ -29,10 +37,16 @@ namespace Geostorm.GameData
             GameEvents gameEvents = new();
 
             // Update the game state with entity information.
-            gameState.PlayerPos = player.Pos;
+            gameState.PlayerPos    = player.Pos;
+            gameState.GameDuration = GameDuration;
+            gameState.Score        = Score;
 
             // Update the entity collisions.
             Collisions.DoCollisions(ref player, ref bullets, ref enemies, entityVertices);
+
+            // Update the stars.
+            foreach (Star star in stars)
+                star.Update(gameState, gameInputs, ref gameEvents);
 
             // Update the player.
             player.Update(gameState, gameInputs, ref gameEvents);
@@ -63,15 +77,17 @@ namespace Geostorm.GameData
 
         public void Draw(in GraphicsController graphicsController)
         {
-            // Draw the enemies and bullets.
+            // Draw the stars in the background.
+            foreach (Star star in stars)
+                graphicsController.DrawEntity(star, entityVertices);
+
+            // Draw the enemies and their spawn animations.
             foreach(Enemy  enemy  in enemies) 
-            {
-                if (enemy.SpawnDelay.Counter <= 0)
-                    graphicsController.DrawEntity(enemy, entityVertices);
-                else
-                    graphicsController.DrawLines(entityVertices.GetEntitySpawnAnimation(enemy, enemy.SpawnDelay), entityVertices.GetEntityColor(enemy));
-            }
-            foreach(Bullet bullet in bullets) graphicsController.DrawEntity(bullet, entityVertices);
+                graphicsController.DrawEntity(enemy, entityVertices);
+
+            // Draw the bullets.
+            foreach(Bullet bullet in bullets) 
+                graphicsController.DrawEntity(bullet, entityVertices);
 
             // Draw the player and its invincibility shield.
             graphicsController.DrawEntity(player, entityVertices);

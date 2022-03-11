@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Numerics;
 using System.Collections.Generic;
+using static System.MathF;
 
 using Raylib_cs;
-using static Raylib_cs.Shader;
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
-using static MyMathLib.Collisions2D;
 using static MyMathLib.Colors;
 
 using Geostorm.Core;
@@ -91,6 +90,14 @@ namespace Geostorm.Renderer
         // ---------- Miscelaneous ---------- //
 
         public bool WindowShouldClose() { return Raylib.WindowShouldClose(); }
+
+        public static Color RGBAtoRayCol(RGBA rgba) 
+        {
+            return new Color((int)(rgba.R*255.0), 
+                             (int)(rgba.G*255.0), 
+                             (int)(rgba.B*255.0), 
+                             (int)(rgba.A*255.0)); 
+        }
 
 
         // ---------- Game state ---------- //
@@ -242,9 +249,11 @@ namespace Geostorm.Renderer
             Raylib.EndDrawing();
         }
 
-        public void DrawLines(in Vector2[] vertices, RGBA color)
+        public void DrawLines(in Vector2[] vertices, RGBA color, bool detached = false)
         {
-            Raylib.DrawLineStrip(vertices, vertices.Length, new Color((int)(color.R*255.0), (int)(color.G*255.0), (int)(color.B*255.0), (int)(color.A*255.0)));
+            // Raylib.DrawLineStrip(vertices, vertices.Length, RGBAtoRayCol(color));
+            for (int i = 0; i < vertices.Length-1; i += (detached ? 2 : 1))
+                Raylib.DrawLineEx(vertices[i], vertices[i+1], 1, RGBAtoRayCol(color));
         }
 
         public void DrawEntity<T>(in T entity, in EntityVertices entityVertices) where T : IEntity
@@ -253,6 +262,21 @@ namespace Geostorm.Renderer
             int       vertexCount = vertices.Length;
             RGBA      rgba        = entityVertices.GetEntityColor   (entity);
             Color     color       = new(RoundInt(rgba.R*255), RoundInt(rgba.G*255), RoundInt(rgba.B*255), RoundInt(rgba.A*255)); 
+
+            // Draw circles for the stars.
+            if (entity is Star star)
+            { 
+                Raylib.DrawCircle((int)star.Pos.X, (int)star.Pos.Y, star.Radius, RGBAtoRayCol(star.Color));
+                return;
+            }
+
+            // Draw the spawn animation for enemies.
+            if (entity is Enemy enemy && enemy.SpawnDelay.Counter >= 0)
+            {
+                DrawLines(entityVertices.GetEntitySpawnAnimation(enemy, enemy.SpawnDelay),
+                          entityVertices.GetEntityColor(enemy), true);
+                return;
+            }
 
             // Loop on the entity's vertices and draw lines between them.
             Raylib.DrawLineStrip(vertices, vertexCount, color);
@@ -274,6 +298,33 @@ namespace Geostorm.Renderer
                                       entityVertices.CursorVertices[i+1] + Raylib.GetMousePosition(), 
                                       1, Color.WHITE);
                 }
+            }
+        }
+
+        public void DrawBackgroundStars(double gameDuration)
+        {
+            Random rnd = new(0);
+
+            for (int i = 0; i < 100; i++)
+            {
+                // Get a random position and radius for the star.
+                Vector2 pos    = new(rnd.Next(0, Raylib.GetScreenWidth()), rnd.Next(0, Raylib.GetScreenHeight()));
+                int     radius = (int)ClampAbove(rnd.Next(0, 4), 1.0f);
+
+                // Get a random color and make it as white as possible.
+                Color color  = new(rnd.Next(135, 255), rnd.Next(135, 255), rnd.Next(135, 255), 255);
+                int   minVal = (int)Min(255-color.r, Min(255-color.g, 255-color.b));
+                color.r += (byte)minVal;
+                color.g += (byte)minVal;
+                color.b += (byte)minVal;
+
+                // Move the star to the right.
+                pos.X -= (float)gameDuration * 30 * radius;
+                if (pos.X < 0)
+                    pos.X += Raylib.GetScreenWidth();
+
+                // Draw the star.
+                Raylib.DrawCircle((int)pos.X, (int)pos.Y, radius, color);
             }
         }
     }
