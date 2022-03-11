@@ -1,14 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "waE1+mnKvdKSG2Rj5ZRPsV8u9fiwRZ6GSUGa/8r6aHDHM2jgkgBYt2vWUf+oC1jpjmMRbeCOGo/dbQJ2WW4z1Q==",
+  "dgSpecHash": "pafp51FRXSXLPsK8KMZJ8HZHP5gNnBfLEllDB7nKHhYxwYcOtHjek9y7DaklkBDxmHip0oTc84dlWAvk5JWkGw==",
   "success": true,
-  "projectFilePath": "D:\\Documents\\Work\\ISART Digital\\GP1\\Geostorm\\Geostorm\\Geostorm.csproj",
+  "projectFilePath": "C:\\Users\\r.serra\\Documents\\GP1\\CsProjects\\Geostorm\\Geostorm\\Geostorm.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\remis\\.nuget\\packages\\imgui.net\\1.87.0\\imgui.net.1.87.0.nupkg.sha512",
-    "C:\\Users\\remis\\.nuget\\packages\\raylib-cs\\4.0.0.1\\raylib-cs.4.0.0.1.nupkg.sha512",
-    "C:\\Users\\remis\\.nuget\\packages\\system.buffers\\4.4.0\\system.buffers.4.4.0.nupkg.sha512",
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
-    "C:\\Users\\remis\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.4.0\\system.runtime.compilerservices.unsafe.4.4.0.nupkg.sha512"
+    "C:\\Users\\r.serra\\.nuget\\packages\\imgui.net\\1.87.0\\imgui.net.1.87.0.nupkg.sha512",
+    "C:\\Users\\r.serra\\.nuget\\packages\\raylib-cs\\4.0.0.1\\raylib-cs.4.0.0.1.nupkg.sha512",
+    "C:\\Users\\r.serra\\.nuget\\packages\\system.buffers\\4.4.0\\system.buffers.4.4.0.nupkg.sha512",
+    "C:\\Users\\r.serra\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Users\\r.serra\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.4.0\\system.runtime.compilerservices.unsafe.4.4.0.nupkg.sha512"
   ],
   "logs": []
 }

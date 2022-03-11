@@ -10,10 +10,6 @@ varying vec4 fragColor;
 uniform sampler2D texture0;
 uniform vec4      colDiffuse;
 
-// Variables.
-const vec2 screenSize = vec2(1920, 1080);
-const vec2 pixelSize  = vec2(1) / screenSize;
-
 void main()
 {
     // Add the two textures together.

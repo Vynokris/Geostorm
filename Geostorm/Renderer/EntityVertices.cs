@@ -8,13 +8,27 @@ namespace Geostorm.Renderer
 {
     public class EntityVertices
     {
-        public Vector2[] PlayerVertices   = new Vector2[8];
-        public Vector2[] BulletVertices   = new Vector2[4];
-        public Vector2[] WandererVertices = new Vector2[13];
-        public Vector2[] GruntVertices    = new Vector2[4];
+        public Vector2[] CursorVertices   = new Vector2[8];
+        public Vector2[] PlayerVertices   = new Vector2[9];
+        public Vector2[] BulletVertices   = new Vector2[5];
+        public Vector2[] WandererVertices = new Vector2[14];
+        public Vector2[] GruntVertices    = new Vector2[5];
 
         public EntityVertices()
         {
+            // Load cursor vertices (used to shoot with mouse).
+            {
+                float preScale = 15;
+                CursorVertices[0] = new Vector2( 0.0f,  0.3f) * preScale;
+                CursorVertices[1] = new Vector2( 0.0f,  1.0f) * preScale;
+                CursorVertices[2] = new Vector2( 0.0f, -0.3f) * preScale;
+                CursorVertices[3] = new Vector2( 0.0f, -1.0f) * preScale;
+                CursorVertices[4] = new Vector2( 0.3f,  0.0f) * preScale;
+                CursorVertices[5] = new Vector2( 1.0f,  0.0f) * preScale;
+                CursorVertices[6] = new Vector2(-0.3f,  0.0f) * preScale;
+                CursorVertices[7] = new Vector2(-1.0f,  0.0f) * preScale;
+            }
+
             // Load player vertices.
             { 
                 float preScale = 20;
@@ -26,6 +40,7 @@ namespace Geostorm.Renderer
                 PlayerVertices[5] = new Vector2(-0.2f,  0.8f)  * preScale;
                 PlayerVertices[6] = new Vector2( 0.8f,  0.3f)  * preScale;
                 PlayerVertices[7] = new Vector2( 0.0f,  0.55f) * preScale;
+                PlayerVertices[8] = new Vector2(-0.3f,  0.0f)  * preScale;
             }
 
             // Load bullet vertices.
@@ -35,6 +50,7 @@ namespace Geostorm.Renderer
                 BulletVertices[1] = new Vector2(-0.1f,  0.2f) * preScale;
                 BulletVertices[2] = new Vector2( 0.8f,  0.0f) * preScale;
                 BulletVertices[3] = new Vector2(-0.1f, -0.2f) * preScale;
+                BulletVertices[4] = new Vector2(-0.3f,  0.0f) * preScale;
             }
 
             // Load wanderer vertices.
@@ -53,6 +69,7 @@ namespace Geostorm.Renderer
                 WandererVertices[10] = new Vector2( 1,  0) * preScale;
                 WandererVertices[11] = new Vector2( 1, -1) * preScale;
                 WandererVertices[12] = new Vector2( 0,  0) * preScale;
+                WandererVertices[13]  = new Vector2( 0,  0) * preScale;
             }
 
             // Load grunt vertices.
@@ -62,6 +79,7 @@ namespace Geostorm.Renderer
                 GruntVertices[1] = new Vector2(-0.0f,-1.0f) * preScale;
                 GruntVertices[2] = new Vector2( 1.0f, 0.0f) * preScale;
                 GruntVertices[3] = new Vector2(-0.0f, 1.0f) * preScale;
+                GruntVertices[4] = new Vector2(-1.0f, 0.0f) * preScale;
             }
         }
 

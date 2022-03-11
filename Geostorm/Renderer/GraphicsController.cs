@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Numerics;
+using System.Collections.Generic;
 
 using Raylib_cs;
 using static Raylib_cs.Shader;
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
+using static MyMathLib.Collisions2D;
 using static MyMathLib.Colors;
 
 using Geostorm.Core;
@@ -16,38 +18,71 @@ namespace Geostorm.Renderer
 {
     public class GraphicsController : IDisposable
     {
-        public int ScreenWidth  { get; }
-        public int ScreenHeight { get; }
-        public readonly int BloomIntensity = 30;
-        private Shader BlurShader;
+        public int ScreenWidth  { get; private set; } = 1920;
+        public int ScreenHeight { get; private set; } = 1080;
+
+        public readonly int BloomIntensity = 5;
+        private Shader GaussianBlurShader;
         private Shader NonBlackMaskShader;
+        private Shader ChromaticAberrationShader;
+        private int BlurDirLocation;
+
         private RenderTexture2D RenderTexture;
         private RenderTexture2D[] BlurTextures;
 
 
         // ---------- Constructor & destructor ---------- //
 
-        public unsafe GraphicsController(in int screenW, in int screenH)
+        public unsafe GraphicsController()
         {
-            ScreenWidth  = screenW;
-            ScreenHeight = screenH;
-
+            // Create a new raylib window.
             Raylib.SetTraceLogCallback(&Logging.LogConsole);
             Raylib.SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT | ConfigFlags.FLAG_VSYNC_HINT | ConfigFlags.FLAG_WINDOW_RESIZABLE);
-            Raylib.InitWindow(ScreenWidth, ScreenHeight, "ImGui demo");
+            Raylib.InitWindow(ScreenWidth, ScreenHeight, "Geostorm");
             Raylib.SetTargetFPS(60);
 
-            BlurShader         = Raylib.LoadShader(null, "Shaders/Blur.fs");
-            NonBlackMaskShader = Raylib.LoadShader(null, "Shaders/NonBlackPixels.fs");
-            RenderTexture      = Raylib.LoadRenderTexture(ScreenWidth, ScreenHeight);
-            BlurTextures       = new RenderTexture2D[] { Raylib.LoadRenderTexture(ScreenWidth, ScreenHeight), 
-                                                          Raylib.LoadRenderTexture(ScreenWidth, ScreenHeight) };
+            // Get the monitor width and set the window size to it.
+            ScreenWidth  = Raylib.GetMonitorWidth(0);
+            ScreenHeight = Raylib.GetMonitorHeight(0);
+            Raylib.SetWindowSize(ScreenWidth, ScreenHeight);
+            Raylib.ToggleFullscreen();
+
+            // Load shaders.
+            GaussianBlurShader        = Raylib.LoadShader(null, "Shaders/GaussianBlur.fs");
+            NonBlackMaskShader        = Raylib.LoadShader(null, "Shaders/NonBlackPixels.fs");
+            ChromaticAberrationShader = Raylib.LoadShader(null, "Shaders/ChromaticAberration.fs");
+            RenderTexture             = Raylib.LoadRenderTexture(ScreenWidth, ScreenHeight);
+            BlurTextures              = new RenderTexture2D[] { Raylib.LoadRenderTexture(ScreenWidth, ScreenHeight), 
+                                                                Raylib.LoadRenderTexture(ScreenWidth, ScreenHeight) };
+            BlurDirLocation = Raylib.GetShaderLocation(GaussianBlurShader, "isVertical");
+
+            // Set gaussian blur shader screen size.
+            { 
+                int screenWidthLocation = Raylib.GetShaderLocation(GaussianBlurShader, "screenWidth");
+                Raylib.SetShaderValue(GaussianBlurShader, screenWidthLocation, ScreenWidth, ShaderUniformDataType.SHADER_UNIFORM_INT);
+                int screenHeightLocation = Raylib.GetShaderLocation(GaussianBlurShader, "screenHeight");
+                Raylib.SetShaderValue(GaussianBlurShader, screenHeightLocation, ScreenHeight, ShaderUniformDataType.SHADER_UNIFORM_INT);
+            }
+
+            // Set chromatic aberration shader screen size.
+            { 
+                int screenWidthLocation = Raylib.GetShaderLocation(ChromaticAberrationShader, "screenWidth");
+                Raylib.SetShaderValue(ChromaticAberrationShader, screenWidthLocation, ScreenWidth, ShaderUniformDataType.SHADER_UNIFORM_INT);
+                int screenHeightLocation = Raylib.GetShaderLocation(ChromaticAberrationShader, "screenHeight");
+                Raylib.SetShaderValue(ChromaticAberrationShader, screenHeightLocation, ScreenHeight, ShaderUniformDataType.SHADER_UNIFORM_INT);
+            }
 
             Raylib.InitAudioDevice();
         }
 
         public void Dispose()
         {
+            Raylib.UnloadShader(GaussianBlurShader);
+            Raylib.UnloadShader(NonBlackMaskShader);
+            Raylib.UnloadShader(ChromaticAberrationShader);
+            Raylib.UnloadRenderTexture(RenderTexture);
+            Raylib.UnloadRenderTexture(BlurTextures[0]);
+            Raylib.UnloadRenderTexture(BlurTextures[1]);
             Raylib.CloseAudioDevice();
             Raylib.CloseWindow();
         }
@@ -132,39 +167,46 @@ namespace Geostorm.Renderer
 
         public void BeginDrawing()
         {
+            Raylib.HideCursor();
             Raylib.BeginTextureMode(RenderTexture);
             Raylib.ClearBackground(Color.BLACK);
         }
 
         private void ApplyBloom()
         {
-            // Draw the render texture on the first blurring texture.
-            Raylib.BeginTextureMode(BlurTextures[0]);
-            {
-                Raylib.ClearBackground(Color.BLACK);
-
-                Raylib.DrawTextureRec(RenderTexture.texture,
-                                      new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
-                                      new Vector2  (0, 0),
-                                      Color.WHITE);
-            }
-            Raylib.EndTextureMode();
-
-            // Blur the 2 blurring render textures (ping pong texturing).
             for (int i = 0; i < BloomIntensity; i++)
             {
-                Raylib.BeginTextureMode(BlurTextures[(i+1)%2]);
+                // Draw the render texture on the first blurring texture.
+                Raylib.BeginTextureMode(BlurTextures[0]);
                 {
-                    Raylib.ClearBackground(Color.BLACK);
-
-                    Raylib.BeginShaderMode(BlurShader);
-                    Raylib.DrawTextureRec(BlurTextures[i%2].texture,
+                    if (i == 0)
+                        Raylib.ClearBackground(Color.BLACK);
+                    Raylib.BeginShaderMode(NonBlackMaskShader);
+                    Raylib.DrawTextureRec(RenderTexture.texture,
                                           new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
                                           new Vector2  (0, 0),
                                           Color.WHITE);
                     Raylib.EndShaderMode();
                 }
                 Raylib.EndTextureMode();
+
+                // Blur the 2 blurring render textures (ping pong texturing).
+                for (int j = 0; j < 2; j++)
+                { 
+                    Raylib.BeginTextureMode(BlurTextures[(j+1)%2]);
+                    {
+                        Raylib.ClearBackground(Color.BLACK);
+
+                        Raylib.BeginShaderMode(GaussianBlurShader);
+                        Raylib.SetShaderValue(GaussianBlurShader, BlurDirLocation, j, ShaderUniformDataType.SHADER_UNIFORM_INT);
+                        Raylib.DrawTextureRec(BlurTextures[j].texture,
+                                              new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
+                                              new Vector2  (0, 0),
+                                              Color.WHITE);
+                        Raylib.EndShaderMode();
+                    }
+                    Raylib.EndTextureMode();
+                }
             }
         }
 
@@ -178,17 +220,23 @@ namespace Geostorm.Renderer
             Raylib.BeginDrawing();
             {
                 Raylib.ClearBackground(Color.BLACK);
-
-                Raylib.DrawTextureRec(BlurTextures[0].texture,
-                                      new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
-                                      new Vector2  (0, 0),
-                                      Color.WHITE);
-
-                Raylib.BeginShaderMode(NonBlackMaskShader);
-                Raylib.DrawTextureRec(RenderTexture.texture,
-                                      new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
-                                      new Vector2  (0, 0),
-                                      Color.WHITE);
+                
+                Raylib.BeginShaderMode(ChromaticAberrationShader);
+                { 
+                    Raylib.DrawTextureRec(BlurTextures[0].texture,
+                                            new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
+                                            new Vector2  (0, 0),
+                                            Color.WHITE);
+                
+                    Raylib.BeginShaderMode(NonBlackMaskShader);
+                    { 
+                        Raylib.DrawTextureRec(RenderTexture.texture,
+                                                new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
+                                                new Vector2  (0, 0),
+                                                Color.WHITE);
+                    }
+                    Raylib.EndShaderMode();
+                }
                 Raylib.EndShaderMode();
             }
             Raylib.EndDrawing();
@@ -202,18 +250,26 @@ namespace Geostorm.Renderer
             Color     color       = new(RoundInt(rgba.R*255), RoundInt(rgba.G*255), RoundInt(rgba.B*255), RoundInt(rgba.A*255)); 
 
             // Loop on the entity's vertices and draw lines between them.
-            for (int i = 0; i < vertexCount; i++)
-            {
-                Raylib.DrawLine((int)vertices[i].X,                 (int)vertices[i].Y,
-                                (int)vertices[(i+1)%vertexCount].X, (int)vertices[(i+1)%vertexCount].Y,
-                                color);
-            }
+            Raylib.DrawLineStrip(vertices, vertexCount, color);
         }
 
         public void DrawPlayerShield(Vector2 pos, float remainingFrames)
         {
             if ((remainingFrames > 90 || (int)(remainingFrames / 10) % 3 == 0) && remainingFrames > 0)
                 Raylib.DrawCircleLines((int)pos.X, (int)pos.Y, 25, Color.WHITE);
+        }
+
+        public void DrawCursor(in EntityVertices entityVertices, in List<Enemy> enemies)
+        {
+            if (!Raylib.IsGamepadAvailable(0))
+            {
+                for (int i = 0; i < 8; i+=2)
+                {
+                    Raylib.DrawLineEx(entityVertices.CursorVertices[i]   + Raylib.GetMousePosition(), 
+                                      entityVertices.CursorVertices[i+1] + Raylib.GetMousePosition(), 
+                                      1, Color.WHITE);
+                }
+            }
         }
     }
 }
