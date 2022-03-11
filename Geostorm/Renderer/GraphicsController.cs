@@ -24,9 +24,9 @@ namespace Geostorm.Renderer
         private Shader GaussianBlurShader;
         private Shader NonBlackMaskShader;
         private Shader ChromaticAberrationShader;
-        private int BlurDirLocation;
+        private int    BlurDirLocation;
 
-        private RenderTexture2D RenderTexture;
+        private RenderTexture2D   RenderTexture;
         private RenderTexture2D[] BlurTextures;
 
 
@@ -45,6 +45,9 @@ namespace Geostorm.Renderer
             ScreenHeight = Raylib.GetMonitorHeight(0);
             Raylib.SetWindowSize(ScreenWidth, ScreenHeight);
             Raylib.SetWindowPosition(0, 0);
+
+            // Adjust the bloom intensity accrding to screen size.
+            BloomIntensity = (int)(BloomIntensity * ScreenWidth / 2560f);
 
             // Load shaders.
             GaussianBlurShader        = Raylib.LoadShader(null, "Shaders/GaussianBlur.fs");
@@ -278,17 +281,21 @@ namespace Geostorm.Renderer
                 return;
             }
 
+            // Draw the player's shield.
+            if (entity is Player player)
+            {
+                if (!player.Invincibility.HasEnded() && 
+                    (player.Invincibility.Counter > 90 || (int)(player.Invincibility.Counter / 10) % 3 == 0))
+                {
+                    Raylib.DrawCircleLines((int)entity.Pos.X, (int)entity.Pos.Y, 25, Color.WHITE);
+                }
+            }
+
             // Loop on the entity's vertices and draw lines between them.
             Raylib.DrawLineStrip(vertices, vertexCount, color);
         }
 
-        public void DrawPlayerShield(Vector2 pos, float remainingFrames)
-        {
-            if ((remainingFrames > 90 || (int)(remainingFrames / 10) % 3 == 0) && remainingFrames > 0)
-                Raylib.DrawCircleLines((int)pos.X, (int)pos.Y, 25, Color.WHITE);
-        }
-
-        public void DrawCursor(in EntityVertices entityVertices, in List<Enemy> enemies)
+        public void DrawCursor(in EntityVertices entityVertices)
         {
             if (!Raylib.IsGamepadAvailable(0))
             {
@@ -298,33 +305,6 @@ namespace Geostorm.Renderer
                                       entityVertices.CursorVertices[i+1] + Raylib.GetMousePosition(), 
                                       1, Color.WHITE);
                 }
-            }
-        }
-
-        public void DrawBackgroundStars(double gameDuration)
-        {
-            Random rnd = new(0);
-
-            for (int i = 0; i < 100; i++)
-            {
-                // Get a random position and radius for the star.
-                Vector2 pos    = new(rnd.Next(0, Raylib.GetScreenWidth()), rnd.Next(0, Raylib.GetScreenHeight()));
-                int     radius = (int)ClampAbove(rnd.Next(0, 4), 1.0f);
-
-                // Get a random color and make it as white as possible.
-                Color color  = new(rnd.Next(135, 255), rnd.Next(135, 255), rnd.Next(135, 255), 255);
-                int   minVal = (int)Min(255-color.r, Min(255-color.g, 255-color.b));
-                color.r += (byte)minVal;
-                color.g += (byte)minVal;
-                color.b += (byte)minVal;
-
-                // Move the star to the right.
-                pos.X -= (float)gameDuration * 30 * radius;
-                if (pos.X < 0)
-                    pos.X += Raylib.GetScreenWidth();
-
-                // Draw the star.
-                Raylib.DrawCircle((int)pos.X, (int)pos.Y, radius, color);
             }
         }
     }

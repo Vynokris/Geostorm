@@ -23,7 +23,7 @@ namespace Geostorm.GameData
             player  = new(Vector2Create(screenW/2, screenH/2));
             spawner = new(screenW, screenH);
 
-            int StarsCount = 200;
+            int StarsCount = 100;
             for (int i = 0; i < StarsCount; i++)
                 stars.Add(new Star(screenW, screenH));
         }
@@ -91,8 +91,9 @@ namespace Geostorm.GameData
 
             // Draw the player and its invincibility shield.
             graphicsController.DrawEntity(player, entityVertices);
-            graphicsController.DrawPlayerShield(player.Pos, player.Invincibility.Counter);
-            graphicsController.DrawCursor(entityVertices, enemies);
+
+            // Draw the cursor.
+            graphicsController.DrawCursor(entityVertices);
         }
     }
 }
