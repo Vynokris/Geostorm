@@ -6,13 +6,12 @@ namespace MyMathLib
 
     public static class Colors
     {
-        public class HSV
+        public struct HSV
         {
             public float H { get; set; }
             public float S { get; set; }
             public float V { get; set; }
 
-            public HSV() { H = 0; S = 0; V = 0; }
             public HSV(float h, float s, float v) { H = h; S = s; V = v; }
 
             // Convert an HSV color to RGBA.
@@ -46,15 +45,28 @@ namespace MyMathLib
             }
         }
 
-        public class RGBA
+        public struct RGBA
         {
             public float R { get; set; }
             public float G { get; set; }
             public float B { get; set; }
             public float A { get; set; }
 
-            public RGBA()                                   { R = 0; G = 0; B = 0; A = 1; }
             public RGBA(float r, float g, float b, float a) { R = r; G = g; B = b; A = a; }
+
+            // Shifts the hue of the given color.
+            public void Shift(float hue)
+            {
+                HSV hsv = ToHSV();
+                hsv.H += hue;
+                if (hsv.H >= 2 * (float)PI) hsv.H -= 2 * (float)PI;
+                else if (hsv.H < 0)         hsv.H += 2 * (float)PI;
+                RGBA result = hsv.ToRGBA(A);
+
+                R = result.R;
+                G = result.G;
+                B = result.B;
+            }
 
             // Convert an RGBA color (0 <= rgba <= 1) to HSV.
             public HSV ToHSV()
@@ -86,18 +98,6 @@ namespace MyMathLib
                 if (hsv.H < 0) hsv.H += 2 * (float)PI;
 
                 return hsv;
-            }
-
-            // Shifts the hue of the given color.
-            public RGBA Shift(float hue)
-            {
-                HSV hsv = this.ToHSV();
-                hsv.H += hue;
-                if (hsv.H >= 2 * (float)PI) hsv.H -= 2 * (float)PI;
-                else if (hsv.H < 0)         hsv.H += 2 * (float)PI;
-                RGBA result = hsv.ToRGBA(A);
-
-                return result;
             }
         }
     }

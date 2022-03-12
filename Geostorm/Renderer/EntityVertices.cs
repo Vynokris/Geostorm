@@ -12,11 +12,20 @@ namespace Geostorm.Renderer
 {
     public class EntityVertices
     {
+        public RGBA PlayerColor   = new(1, 1, 1, 1);
+        public RGBA BulletColor   = new(1, 1, 0, 1);
+        public RGBA GeomColor     = new(0.54f, 0.68f, 0.33f, 1);
+        public RGBA WandererColor = new(1, 0, 1, 1);
+        public RGBA GruntColor    = new(0, 1, 1, 1);
+        public RGBA WeaverColor   = new(0, 1, 0, 1);
+
         public Vector2[] CursorVertices   = new Vector2[8];
         public Vector2[] PlayerVertices   = new Vector2[9];
         public Vector2[] BulletVertices   = new Vector2[5];
+        public Vector2[] GeomVertices     = new Vector2[5];
         public Vector2[] WandererVertices = new Vector2[14];
         public Vector2[] GruntVertices    = new Vector2[5];
+        public Vector2[] WeaverVertices   = new Vector2[10];
 
         public EntityVertices()
         {
@@ -49,7 +58,7 @@ namespace Geostorm.Renderer
 
             // Load bullet vertices.
             { 
-                float preScale = 15.0f;
+                float preScale = 15;
                 BulletVertices[0] = new Vector2(-0.3f,  0.0f) * preScale;
                 BulletVertices[1] = new Vector2(-0.1f,  0.2f) * preScale;
                 BulletVertices[2] = new Vector2( 0.8f,  0.0f) * preScale;
@@ -57,9 +66,19 @@ namespace Geostorm.Renderer
                 BulletVertices[4] = new Vector2(-0.3f,  0.0f) * preScale;
             }
 
+            // Load geom vertices.
+            {
+                float preScale = 10;
+                GeomVertices[0] = new Vector2(-1.0f, 0.0f) * preScale;
+                GeomVertices[1] = new Vector2( 0.0f,-0.5f) * preScale;
+                GeomVertices[2] = new Vector2( 1.0f, 0.0f) * preScale;
+                GeomVertices[3] = new Vector2( 0.0f, 0.5f) * preScale;
+                GeomVertices[4] = new Vector2(-1.0f, 0.0f) * preScale;
+            }
+
             // Load wanderer vertices.
             {
-                float preScale = 15.0f;
+                float preScale = 18;
                 WandererVertices[0]  = new Vector2( 0,  0) * preScale;
                 WandererVertices[1]  = new Vector2( 0, -1) * preScale;
                 WandererVertices[2]  = new Vector2(-1, -1) * preScale;
@@ -78,12 +97,27 @@ namespace Geostorm.Renderer
 
             // Load grunt vertices.
             {
-                float preScale = 18.0f;
+                float preScale = 18;
                 GruntVertices[0] = new Vector2(-1.0f, 0.0f) * preScale;
-                GruntVertices[1] = new Vector2(-0.0f,-1.0f) * preScale;
+                GruntVertices[1] = new Vector2( 0.0f,-1.0f) * preScale;
                 GruntVertices[2] = new Vector2( 1.0f, 0.0f) * preScale;
-                GruntVertices[3] = new Vector2(-0.0f, 1.0f) * preScale;
+                GruntVertices[3] = new Vector2( 0.0f, 1.0f) * preScale;
                 GruntVertices[4] = new Vector2(-1.0f, 0.0f) * preScale;
+            }
+
+            // Load weaver vertices.
+            {
+                float preScale = 18;
+                WeaverVertices[0] = new Vector2( 1, -1) * preScale;
+                WeaverVertices[1] = new Vector2(-1, -1) * preScale;
+                WeaverVertices[2] = new Vector2(-1,  1) * preScale;
+                WeaverVertices[3] = new Vector2( 1,  1) * preScale;
+                WeaverVertices[4] = new Vector2( 1,  0) * preScale;
+                WeaverVertices[5] = new Vector2( 0, -1) * preScale;
+                WeaverVertices[6] = new Vector2(-1,  0) * preScale;
+                WeaverVertices[7] = new Vector2( 0,  1) * preScale;
+                WeaverVertices[8] = new Vector2( 1,  0) * preScale;
+                WeaverVertices[9] = new Vector2( 1, -1) * preScale;
             }
         }
 
@@ -99,11 +133,17 @@ namespace Geostorm.Renderer
             else if (entityType == typeof(Bullet)) {
                 vertices = (Vector2[])BulletVertices.Clone();
             }
+            else if (entityType == typeof(Geom)) {
+                vertices = (Vector2[])GeomVertices.Clone();
+            }
             else if (entityType == typeof(Grunt)) {
                 vertices = (Vector2[])GruntVertices.Clone();
             }
             else if (entityType == typeof(Wanderer)) {
                 vertices = (Vector2[])WandererVertices.Clone();
+            }
+            else if (entityType == typeof(Weaver)) {
+                vertices = (Vector2[])WeaverVertices.Clone();
             }
 
             // Transform the entity's vertices to screen positions.
@@ -132,20 +172,23 @@ namespace Geostorm.Renderer
         public RGBA GetEntityColor<T>(T entity) where T : IEntity
         {
             Type entityType = entity.GetType();
-            RGBA color = new();
+            RGBA color      = PlayerColor;
 
             // Get the right vertices and color in function of the entity.
-            if      (entityType == typeof(Player)) {
-                color = new RGBA(1, 1, 1, 1);
+            if (entityType == typeof(Bullet)) {
+                color = BulletColor;
             }
-            else if (entityType == typeof(Bullet)) {
-                color = new RGBA(1, 1, 0, 1);
-            }
-            else if (entityType == typeof(Grunt)) {
-                color = new RGBA(0, 1, 1, 1);
+            else if (entityType == typeof(Geom)) {
+                color = GeomColor;
             }
             else if (entityType == typeof(Wanderer)) {
-                color = new RGBA(1, 0, 1, 1);
+                color = WandererColor;
+            }
+            else if (entityType == typeof(Grunt)) {
+                color = GruntColor;
+            }
+            else if (entityType == typeof(Weaver)) {
+                color = WeaverColor;
             }
 
             return color;

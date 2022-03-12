@@ -8,20 +8,22 @@ namespace Geostorm.Utility
 {
     public class Cooldown
     {
-        public int Duration { get; private set; } = 0;
-        public int Counter  { get; set; }         = 0;
+        public float Duration { get; private set; } = 0;
+        public float Counter  { get; set; }         = 0;
 
         public Cooldown() {  }
-        public Cooldown(in int duration) { Duration = duration; Counter = duration; }
+        public Cooldown(in float duration) { Duration = duration; Counter = duration; }
 
-        public bool Update()
+        public bool Update(float deltaTime)
         {
-            if (Counter > 0)
-            {
-                Counter--;
+            if (Counter > 0) {
+                Counter -= deltaTime;
                 return false;
             }
-            return true;
+            else {
+                Counter = 0;
+                return true;
+            }
         }
 
         public bool HasEnded()
@@ -41,7 +43,7 @@ namespace Geostorm.Utility
             Counter = Duration;
         }
 
-        public void ChangeDuration(in int duration)
+        public void ChangeDuration(in float duration)
         {
             Duration = duration;
             Counter  = duration;

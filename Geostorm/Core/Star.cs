@@ -23,16 +23,19 @@ namespace Geostorm.Core
             Radius   = (int)ClampAbove(rnd.Next(-1, 4), 1.0f);
             Velocity = new(-0.7f * Radius, 0);
 
-            // Get a random color.
-            Color = new(rnd.Next(135, 255) / 255.0f, 
-                        rnd.Next(135, 255) / 255.0f, 
-                        rnd.Next(135, 255) / 255.0f, 1);
+            // Get random red green and blue values.
+            float R = rnd.Next(135, 255) / 255.0f;
+            float G = rnd.Next(135, 255) / 255.0f;
+            float B = rnd.Next(135, 255) / 255.0f;
 
             // Make the color as white as possible.
-            float minVal = Min(1-Color.R, Min(1-Color.G, 1-Color.B));
-            Color.R += minVal;
-            Color.G += minVal;
-            Color.B += minVal;
+            float minVal = Min(1-R, Min(1-G, 1-B));
+            R += minVal;
+            G += minVal;
+            B += minVal;
+
+            // Set the star's color.
+            Color = new(R, G, B, 1);
         }
 
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)

@@ -20,11 +20,11 @@ namespace Geostorm.Renderer
         public int ScreenWidth  { get; private set; } = 1920;
         public int ScreenHeight { get; private set; } = 1080;
 
-        public readonly int BloomIntensity = 5;
         private Shader GaussianBlurShader;
         private Shader NonBlackMaskShader;
         private Shader ChromaticAberrationShader;
-        private int    BlurDirLocation;
+        private readonly int BlurDirLocation;
+        public  readonly int BloomIntensity = 5;
 
         private RenderTexture2D   RenderTexture;
         private RenderTexture2D[] BlurTextures;
@@ -43,8 +43,8 @@ namespace Geostorm.Renderer
             // Get the monitor width and set the window size to it.
             ScreenWidth  = Raylib.GetMonitorWidth(0);
             ScreenHeight = Raylib.GetMonitorHeight(0);
-            Raylib.SetWindowSize(ScreenWidth, ScreenHeight);
-            Raylib.SetWindowPosition(0, 0);
+            Raylib.SetWindowSize(ScreenWidth, ScreenHeight+1);
+            Raylib.SetWindowPosition(0, -1);
 
             // Adjust the bloom intensity accrding to screen size.
             BloomIntensity = (int)(BloomIntensity * ScreenWidth / 2560f);
@@ -105,17 +105,13 @@ namespace Geostorm.Renderer
 
         // ---------- Game state ---------- //
 
-        public GameState GetGameState()
+        public void UpdateGameState(ref GameState gameState)
         {
-            GameState gameState = new();
-
-            // Get the screensize.
-            gameState.ScreenSize = Vector2Create(ScreenWidth, ScreenHeight);
-
             // Get the delta time.
             gameState.DeltaTime = Raylib.GetFrameTime();
 
-            return gameState;
+            // Update the game duration.
+            gameState.GameDuration += gameState.DeltaTime;
         }
 
 
@@ -265,32 +261,44 @@ namespace Geostorm.Renderer
         {
             Vector2[] vertices    = entityVertices.GetEntityVertices(entity);
             int       vertexCount = vertices.Length;
-            RGBA      rgba        = entityVertices.GetEntityColor   (entity);
-            Color     color       = new(RoundInt(rgba.R*255), RoundInt(rgba.G*255), RoundInt(rgba.B*255), RoundInt(rgba.A*255)); 
+            RGBA      rgbaColor   = entityVertices.GetEntityColor(entity);
+            Color     color       = RGBAtoRayCol(rgbaColor);
+
+            // Draw the player's shield.
+            if (entity is Player player)
+            {
+                if (!player.Invincibility.HasEnded())
+                {
+                    // Make the shield blink 3 times in the last 100 frames of invincivility.
+                    Color shieldColor = Color.WHITE;
+                    if (player.Invincibility.Counter * 60 <= 100 && (int)(player.Invincibility.Counter * 6 - 1) % 3 == 1)
+                        shieldColor.a = 255 / 4;
+
+                    // Draw the shield.
+                    Raylib.DrawCircleLines((int)entity.Pos.X, (int)entity.Pos.Y, 25, shieldColor);
+                }
+            }
+
+            // Make the geoms blink 3 times in 100 frames before they despawn.
+            if (entity is Geom geom)
+            {
+                if (geom.DespawnTimer.Counter * 60 <= 40 && (int)(geom.DespawnTimer.Counter * 6) % 2 == 1)
+                        color.a = 255 / 4;
+            }
+
+            // Draw the spawn animation for enemies.
+            if (entity is Enemy enemy && !enemy.SpawnDelay.HasEnded())
+            {
+                if (enemy.PreSpawnDelay == 0)
+                    DrawLines(entityVertices.GetEntitySpawnAnimation(enemy, enemy.SpawnDelay), rgbaColor, true);
+                return;
+            }
 
             // Draw circles for the stars.
             if (entity is Star star)
             { 
                 Raylib.DrawCircle((int)star.Pos.X, (int)star.Pos.Y, star.Radius, RGBAtoRayCol(star.Color));
                 return;
-            }
-
-            // Draw the spawn animation for enemies.
-            if (entity is Enemy enemy && enemy.SpawnDelay.Counter >= 0)
-            {
-                DrawLines(entityVertices.GetEntitySpawnAnimation(enemy, enemy.SpawnDelay),
-                          entityVertices.GetEntityColor(enemy), true);
-                return;
-            }
-
-            // Draw the player's shield.
-            if (entity is Player player)
-            {
-                if (!player.Invincibility.HasEnded() && 
-                    (player.Invincibility.Counter > 90 || (int)(player.Invincibility.Counter / 10) % 3 == 0))
-                {
-                    Raylib.DrawCircleLines((int)entity.Pos.X, (int)entity.Pos.Y, 25, Color.WHITE);
-                }
             }
 
             // Loop on the entity's vertices and draw lines between them.
@@ -301,7 +309,7 @@ namespace Geostorm.Renderer
         {
             if (!Raylib.IsGamepadAvailable(0))
             {
-                for (int i = 0; i < 8; i+=2)
+                for (int i = 0; i < 8; i += 2)
                 {
                     Raylib.DrawLineEx(entityVertices.CursorVertices[i]   + Raylib.GetMousePosition(), 
                                       entityVertices.CursorVertices[i+1] + Raylib.GetMousePosition(), 

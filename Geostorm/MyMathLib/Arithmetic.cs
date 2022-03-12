@@ -23,7 +23,7 @@ namespace MyMathLib
         public static int SignOf(float val)     { if (val == 0) return 1; return (int)val / Abs((int)val); }
 
         // Converts the given angle from degrees to radians.
-        public static float Deg2Rad(float val)  { return val * ((float)PI / 180f); }
+        public static float DegToRad(float val)  { return val * ((float)PI / 180f); }
 
         // Converts the given angle from radians to degrees.
         public static float RadToDeg(float rad) { return rad * (180f / (float)PI); }

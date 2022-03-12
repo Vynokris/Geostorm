@@ -18,10 +18,6 @@ namespace Geostorm.Core
                     // Check collisions between player and enemies.
                     if (player.Invincibility.HasEnded() && CheckEntityCollisions(player, enemy, entityVertices)) 
                     { 
-                        /*
-                        player.Invincibility.Reset();
-                        player.Health--;
-                        */
                         gameEvents.Add(new PlayerDamagedEvent());
                         if (player.Health <= 1)
                             gameEvents.Add(new PlayerKilledEvent());
@@ -32,10 +28,6 @@ namespace Geostorm.Core
                     {
                         if (CheckEntityCollisions(bullet, enemy, entityVertices)) 
                         {
-                            /*
-                            enemy.Health -= 1;
-                            bullet.Health = 0;
-                            */
                             gameEvents.Add(new EnemyDamagedEvent(enemy, bullet));
                             if (enemy.Health <= 1)
                                 gameEvents.Add(new EnemyKilledEvent(enemy));
@@ -49,19 +41,17 @@ namespace Geostorm.Core
         {
             bool colliding = false;
 
-            Vector2[] vertices1 = entityVertices.GetEntityVertices(entity1);
-            Vector2[] vertices2 = entityVertices.GetEntityVertices(entity2);
-
-            Vector2 prevVertex1 = vertices1[0];
-            Vector2 prevVertex2 = vertices2[0];
-            foreach(Vector2 vertex1 in vertices1)
+            if (entity1.Pos.GetDistanceFromPoint(entity2.Pos) < 30)
             {
-                foreach(Vector2 vertex2 in vertices2)
+                Vector2[] vertices1 = entityVertices.GetEntityVertices(entity1);
+                Vector2[] vertices2 = entityVertices.GetEntityVertices(entity2);
+
+                for (int i = 0; i < vertices1.Length-1; i++)
                 {
-                    if (prevVertex1 != vertex1 && prevVertex2 != vertex2)
+                    for (int j = 0; j < vertices2.Length-1; j++)
                     {
-                        Segment2 segment1 = new(prevVertex1, vertex1);
-                        Segment2 segment2 = new(prevVertex2, vertex2);
+                        Segment2 segment1 = new(vertices1[i], vertices1[i+1]);
+                        Segment2 segment2 = new(vertices2[j], vertices2[j+1]);
 
                         if (CollisionSAT(segment1, segment2))
                             colliding = true;
