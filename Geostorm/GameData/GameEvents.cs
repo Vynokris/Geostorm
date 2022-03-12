@@ -37,6 +37,20 @@ namespace Geostorm.GameData
     {
     }
 
+    public class GeomPickedUpEvent : GameEvent
+    {
+        public Geom geom;
+
+        public GeomPickedUpEvent(Geom pickedUpGeom) { geom = pickedUpGeom; }
+    }
+
+    public class GeomDespawnEvent : GameEvent
+    {
+        public Geom geom;
+
+        public GeomDespawnEvent(Geom despawnedGeom) { geom = despawnedGeom; }
+    }
+
     public class EnemySpawnedEvent : GameEvent
     {
         public Enemy enemy;

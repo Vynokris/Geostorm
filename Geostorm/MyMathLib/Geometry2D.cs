@@ -143,13 +143,24 @@ namespace MyMathLib
         }
 
 
+        // ---- Shapes ---- //
+
+        public interface IShape
+        {
+            public Vector2  GetCenterOfMass();
+            public int      GetSidesNum();
+            public Segment2 GetSide(in int index);
+            public int      GetVerticesNum();
+            public Vector2  GetVertex(in int index);
+            public float    InscribedCircleRadius();
+            public void     Move(in Vector2 vec);
+        }
+
+
         // ---- Segment2 ---- //
-        public class Segment2 : IShape
+        public struct Segment2 : IShape
         {
             public Vector2 A, B;
-
-            // Null Segment.
-            public Segment2() { A = Vector2Zero(); B = Vector2Zero(); }
 
             // Segment from points.
             public Segment2(in Vector2 a, in Vector2 b) { A = a; B = b; }
@@ -198,12 +209,9 @@ namespace MyMathLib
 
 
         // ---- Triangle2 ---- //
-        public class Triangle2 : IShape
+        public struct Triangle2 : IShape
         {
             public Vector2 A, B, C;
-
-            // Null triangle.
-            public Triangle2() { A = Vector2Zero(); B = Vector2Zero(); C = Vector2Zero(); }
 
             // Triangle from points.
             public Triangle2(in Vector2 a, in Vector2 b, in Vector2 c) { A = a; B = b; C = c; }
@@ -264,13 +272,10 @@ namespace MyMathLib
 
 
         // ---- Rectangle2 ---- //
-        public class Rectangle2 : IShape
+        public struct Rectangle2 : IShape
         {
             public Vector2 O;
             public float W, H;
-
-            // Null rectangle.
-            public Rectangle2() { O = Vector2Zero(); W = 0; H = 0; }
 
             // Rectangle from posX posY, width and height.
             public Rectangle2(in float x, in float y, in float w, in float h) { O = Vector2Create(x, y); W = w; H = h; }
@@ -326,14 +331,11 @@ namespace MyMathLib
 
 
         // ---- Polygon2 ---- //
-        public class Polygon2 : IShape
+        public struct Polygon2 : IShape
         {
             public Vector2 O;
             public float Radius, Rot;
             public int Sides;
-
-            // Null polygon.
-            public Polygon2() { O = Vector2Zero(); Radius = 0; Rot = 0; Sides = 3; }
 
             // Polygon from origin, radius, rotation and number of sides.
             public Polygon2(in float x, in float y, in float radius, in float rotation, in int sides)
@@ -352,7 +354,7 @@ namespace MyMathLib
             {
                 Debug.Assert(0 <= index && index < Sides);
 
-                float corner_angle = Arithmetic.Deg2Rad(360 / Sides);
+                float corner_angle = Arithmetic.DegToRad(360 / Sides);
                 float angle_offset = (float)PI / 2 + (index * corner_angle);
                 Vector2 poly_point_a = O + Vector2FromAngle(angle_offset + Rot, Radius);
                 Vector2 poly_point_b = O + Vector2FromAngle(angle_offset + corner_angle + Rot, Radius);
@@ -368,7 +370,7 @@ namespace MyMathLib
             {
                 Debug.Assert(0 <= index && index < Sides);
 
-                float corner_angle = Arithmetic.Deg2Rad(360 / Sides);
+                float corner_angle = Arithmetic.DegToRad(360 / Sides);
                 float angle_offset = (float)PI / 2 + (index * corner_angle);
                 return O + Vector2FromAngle(angle_offset + Rot, Radius);
             }
@@ -385,13 +387,10 @@ namespace MyMathLib
 
 
         // ---- Circle2 ---- //
-        public class Circle2 : IShape
+        public struct Circle2 : IShape
         {
             public Vector2 O;
             public float Radius;
-
-            // Null circle.
-            public Circle2() { O = Vector2Zero(); Radius = 0; }
 
             // Circle from position and radius.
             public Circle2(in float x, in float y, in float radius) { O = Vector2Create(x, y); Radius = radius; }
@@ -419,124 +418,6 @@ namespace MyMathLib
 
             // Moves the circle by the given vector.
             public void Move(in Vector2 vec) { O += vec; }
-        }
-
-
-        // ---- Shapes ---- //
-
-        public interface IShape
-        {
-            public Vector2  GetCenterOfMass();
-            public int      GetSidesNum();
-            public Segment2 GetSide(in int index);
-            public int      GetVerticesNum();
-            public Vector2  GetVertex(in int index);
-            public float    InscribedCircleRadius();
-            public void     Move(in Vector2 vec);
-        }
-
-        // Union that can contain any shape.
-        [StructLayout(LayoutKind.Explicit)]
-        public struct Shape {
-            [FieldOffset(0)] public Vector2    vector;
-            [FieldOffset(0)] public Segment2   segment;
-            [FieldOffset(0)] public Triangle2  triangle;
-            [FieldOffset(0)] public Rectangle2 rectangle;
-            [FieldOffset(0)] public Polygon2   polygon;
-            [FieldOffset(0)] public Circle2    circle;
-        }
-
-        // Shape types enum.
-        public enum ShapeTypes {
-            Vector,
-            Segment,
-            Triangle,
-            Rectangle,
-            Polygon,
-            Circle,
-        }
-
-        // Structure for shape info, holds shape type and data.
-        public class ShapeInfo {
-            public ShapeTypes Type;
-            public Shape Data;
-
-            public ShapeInfo() { Type = ShapeTypes.Triangle; Data.triangle = new Triangle2(); }
-            public ShapeInfo(ShapeTypes type, Shape data) { Type = type; Data = data; }
-
-            // Returns the center of mass of the given shape (returns a vector of coordinates 1,000,000 if the shape type isn't supported).
-            public Vector2 GetCenterOfMass()
-            {
-                return (object)Type switch
-                {
-                    ShapeTypes.Segment   => Data.segment.GetCenterOfMass(),
-                    ShapeTypes.Triangle  => Data.triangle.GetCenterOfMass(),
-                    ShapeTypes.Rectangle => Data.rectangle.GetCenterOfMass(),
-                    ShapeTypes.Polygon   => Data.polygon.GetCenterOfMass(),
-                    ShapeTypes.Circle    => Data.circle.GetCenterOfMass(),
-                    _ => Vector2Create(1000000, 1000000),
-                };
-            }
-            
-            // Returns the number of sides of a given shape (returns 2 for rectangles).
-            public int GetSidesNum()
-            {
-                return Type switch
-                {
-                    ShapeTypes.Segment   => 1,
-                    ShapeTypes.Triangle  => 3,
-                    ShapeTypes.Rectangle => 2,// There are only two axes to check for collision in a rectangle.
-                    ShapeTypes.Polygon   => Data.polygon.Sides,
-                    ShapeTypes.Circle    => 1,
-                    _ => 0,
-                };
-            }
-
-            // Returns the side of the given shape that corresponds to the given index.
-            // Returns a (0, 0) segment if the shape type is not supported (circle and vector).
-            public Segment2 GetSide(int index)
-            {
-                switch (Type)
-                {
-                case ShapeTypes.Segment:
-                    Debug.Assert (index < 1);
-                    return Data.segment;
-                case ShapeTypes.Triangle:
-                    return Data.triangle.GetSide(index);
-                case ShapeTypes.Rectangle:
-                    return Data.rectangle.GetSide(index);
-                case ShapeTypes.Polygon:
-                    return Data.polygon.GetSide(index);
-                default:
-                    return new Segment2(Vector2Zero(), Vector2Zero());
-                }
-            }
-
-            // Returns the number of vertices of a given shape.
-            public int GetVerticesNum()
-            {
-                return (object)Type switch
-                {
-                    ShapeTypes.Segment   => 2,
-                    ShapeTypes.Triangle  => 3,
-                    ShapeTypes.Rectangle => 4,
-                    ShapeTypes.Polygon   => Data.polygon.Sides,
-                    _ => 0,
-                };
-            }
-
-            // Returns the vertex of the given shape that corresponds to the given index.
-            public Vector2 GetVertex(int index)
-            {
-                return Type switch
-                {
-                    ShapeTypes.Segment   => Data.segment.GetVertex(index),
-                    ShapeTypes.Triangle  => Data.triangle.GetVertex(index),
-                    ShapeTypes.Rectangle => Data.rectangle.GetVertex(index),
-                    ShapeTypes.Polygon   => Data.polygon.GetVertex(index),
-                    _ => Vector2Create(1000000, 1000000),
-                };
-            }
         }
     }
 }

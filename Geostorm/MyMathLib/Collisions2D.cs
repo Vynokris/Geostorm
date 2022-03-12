@@ -81,7 +81,7 @@ namespace MyMathLib
                 }
                 // If the first shape is a circle, get its axis.
                 else { 
-                    axis = CircleGetAxis(shape1 as Circle2, shape2);
+                    axis = CircleGetAxis((Circle2)Convert.ChangeType(shape1, typeof(Circle2)), shape2);
                 }
             }
             // If the given index refers to an axis of the second shape...
@@ -96,7 +96,7 @@ namespace MyMathLib
                 }
                 // If the second shape is a circle, get its axis.
                 else { 
-                    axis = CircleGetAxis(shape2 as Circle2, shape1);
+                    axis = CircleGetAxis((Circle2)Convert.ChangeType(shape2, typeof(Circle2)), shape1);
                 }
             }
 
@@ -222,11 +222,17 @@ namespace MyMathLib
         {
             // If both shapes are circles, don't use SAT.
             if (shape1.GetType() == typeof(Circle2) && shape2.GetType() == typeof(Circle2))
-                return CollisionCircles(shape1 as Circle2, shape2 as Circle2);
+            {
+                return CollisionCircles((Circle2)Convert.ChangeType(shape1, typeof(Circle2)), 
+                                        (Circle2)Convert.ChangeType(shape2, typeof(Circle2)));
+            }
 
             // If both shapes are rectangles, don't use SAT.
             else if (shape1.GetType() == typeof(Rectangle2) && shape2.GetType() == typeof(Rectangle2))
-                return CollisionAABB(shape1 as Rectangle2, shape2 as Rectangle2);
+            {
+                return CollisionAABB((Rectangle2)Convert.ChangeType(shape1, typeof(Rectangle2)), 
+                                     (Rectangle2)Convert.ChangeType(shape2, typeof(Rectangle2)));
+            }
 
             // Check for collisions on the shapes' bounding boxes to not have to check if they are not in collision.
             else if (CollisionAABB(GetBoundingBox(shape1), GetBoundingBox(shape2)))

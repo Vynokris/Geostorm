@@ -10,10 +10,10 @@ namespace Geostorm.Core
 {
     public class Player : Entity, IEventListener
     {
-        private readonly Cooldown ShootCooldown = new(5);
-        private readonly Cooldown DashCooldown  = new(20);
-        private readonly Cooldown DashingFrames = new(15);
-        public  readonly Cooldown Invincibility = new(60*3);
+        private readonly Cooldown ShootCooldown = new(0.10f);
+        private readonly Cooldown DashCooldown  = new(0.30f);
+        private readonly Cooldown DashingFrames = new(0.25f);
+        public  readonly Cooldown Invincibility = new(3);
         private readonly int MaxVelocity        = 10;
         private readonly int DashVelocity       = 50;
 
@@ -24,10 +24,10 @@ namespace Geostorm.Core
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Update the player's cooldowns.
-            ShootCooldown.Update();
-            DashCooldown.Update();
-            DashingFrames.Update();
-            Invincibility.Update();
+            ShootCooldown.Update(gameState.DeltaTime);
+            DashCooldown .Update(gameState.DeltaTime);
+            DashingFrames.Update(gameState.DeltaTime);
+            Invincibility.Update(gameState.DeltaTime);
 
             // -- Accelerate -- //
             if (gameInputs.Movement != Vector2Zero())
@@ -39,7 +39,7 @@ namespace Geostorm.Core
                 float dirAngle = gameInputs.Movement.GetAngle();
 
                 // Initiate a dash by going at dashing velocity in the moving dir.
-                if (DashingFrames.CompletionRatio() == 1)
+                if (DashingFrames.CompletionRatio() >= 0.9f)
                     Velocity = Vector2FromAngle(dirAngle, DashVelocity);
 
                 // If the player is under the maximum velocity, make him accelerate.

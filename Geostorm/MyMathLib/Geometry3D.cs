@@ -240,12 +240,9 @@ namespace MyMathLib
 
 
         // ---- Segment3 ---- //
-        public class Segment3
+        public struct Segment3
         {
             public Vertex A, B;
-
-            // Null Segment3.
-            public Segment3() { A = B = new Vertex(); }
 
             // Segement3 from points.
             public Segment3(Vertex a, Vertex b) { A = a;  B = b; }
@@ -271,12 +268,9 @@ namespace MyMathLib
 
 
         // ---- Triangle3 ---- //
-        public class Triangle3
+        public struct Triangle3
         {
             public Vertex A, B, C;
-
-            // Null triangle.
-            public Triangle3() { A = B = C = new Vertex(); }
 
             // Triangle from 3 points.
             public Triangle3(Vertex a, Vertex b, Vertex c) { A = a; B = b; C = c; }

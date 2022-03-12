@@ -9,15 +9,28 @@ namespace Geostorm.Core
 {
     public abstract class Enemy : Entity, IEventListener
     {
-        public readonly Cooldown SpawnDelay = new(0);
+        public float PreSpawnDelay { get; private set; } = 0;
+        public readonly Cooldown SpawnDelay = new(1);
 
         public Enemy() { }
-        public Enemy(Vector2 pos, float health, int spawnDelay) : base(pos, Vector2Create(3, 0), 0, health) { SpawnDelay.ChangeDuration(spawnDelay); }
+        public Enemy(Vector2 pos, float health, float preSpawnDelay = 0) : base(pos, Vector2Create(3, 0), 0, health) 
+        { 
+            PreSpawnDelay = preSpawnDelay; 
+            SpawnDelay.ChangeDuration(preSpawnDelay); 
+        }
 
         public sealed override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
-            if (SpawnDelay.Update())
-                DoUpdate(gameState, gameInputs, ref gameEvents);
+            if (SpawnDelay.Update(gameState.DeltaTime))
+            {
+                if (PreSpawnDelay > 0) {
+                    SpawnDelay.ChangeDuration(1);
+                    PreSpawnDelay = 0;
+                }
+                else {
+                    DoUpdate(gameState, gameInputs, ref gameEvents);
+                }
+            }
         }
 
         public abstract void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents);

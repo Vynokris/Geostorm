@@ -2,6 +2,8 @@ using Geostorm.Core;
 using Geostorm.Renderer;
 using Geostorm.GameData;
 
+using static MyMathLib.Geometry2D;
+
 namespace Geostorm
 {
     class Program
@@ -13,11 +15,13 @@ namespace Geostorm
             GraphicsController graphicsController = new();
             ImguiController    imguiController    = new();
 
-            int screenWidth  = graphicsController.ScreenWidth;
-            int screenHeight = graphicsController.ScreenHeight;
+            int screenW = graphicsController.ScreenWidth;
+            int screenH = graphicsController.ScreenHeight;
 
-            Game game = new(screenWidth, screenHeight);
-            imguiController.Load(screenWidth, screenHeight);
+            Game      game      = new(screenW, screenH);
+            GameState gameState = new(screenW,  screenH);
+
+            imguiController.Load(screenW, screenH);
 
             // ----- Main game loop ----- //
 
@@ -27,11 +31,11 @@ namespace Geostorm
 
                 // Get the game inputs and game state.
                 GameInputs gameInputs = graphicsController.GetInputs();
-                GameState  gameState  = graphicsController.GetGameState();
+                graphicsController.UpdateGameState(ref gameState);
 
                 // Update imgui and the game.
                 imguiController.Update(gameState.DeltaTime);
-                game.Update(gameState, gameInputs);
+                game.Update(ref gameState, gameInputs);
 
 
                 // ----- Draw ----- //
