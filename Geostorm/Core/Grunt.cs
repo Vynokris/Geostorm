@@ -10,7 +10,7 @@ namespace Geostorm.Core
     public class Grunt : Enemy
     {
         public Grunt() { }
-        public Grunt(Vector2 pos, float preSpawnDelay = 0) : base(pos, 1, preSpawnDelay) { }
+        public Grunt(Vector2 pos, float preSpawnDelay = 0) : base(pos, preSpawnDelay) { }
 
         public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {

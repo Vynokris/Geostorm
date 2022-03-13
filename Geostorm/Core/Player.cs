@@ -1,8 +1,10 @@
 ﻿using System.Numerics;
 using System.Collections.Generic;
+
+using static System.MathF;
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
-using static MyMathLib.Colors;
+
 using Geostorm.Utility;
 using Geostorm.GameData;
 
@@ -10,21 +12,21 @@ namespace Geostorm.Core
 {
     public class Player : Entity, IEventListener
     {
-        private readonly Cooldown ShootCooldown = new(0.10f);
+        public           int      Health        = 3;
+        private readonly Weapon   Weapon        = new();
         private readonly Cooldown DashCooldown  = new(0.30f);
         private readonly Cooldown DashingFrames = new(0.25f);
         public  readonly Cooldown Invincibility = new(3);
-        private readonly int MaxVelocity        = 10;
-        private readonly int DashVelocity       = 50;
+        private readonly int      MaxVelocity   = 10;
+        private readonly int      DashVelocity  = 50;
 
         public Player() { }
-        public Player(Vector2 pos)                                   : base(pos, Vector2Zero(), 0,        3) { }
-        public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity,      rotation, 3) { }
+        public Player(Vector2 pos)                                   : base(pos, Vector2Zero(), 0)        { }
+        public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity,      rotation) { }
 
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Update the player's cooldowns.
-            ShootCooldown.Update(gameState.DeltaTime);
             DashCooldown .Update(gameState.DeltaTime);
             DashingFrames.Update(gameState.DeltaTime);
             Invincibility.Update(gameState.DeltaTime);
@@ -73,15 +75,8 @@ namespace Geostorm.Core
                 Rotation = Vector2FromPoints(Pos, gameInputs.ShootTarget).GetAngle();
             }
 
-            // -- Shoot events -- //
-            if (gameInputs.Shoot && ShootCooldown.HasEnded())
-            {
-                gameEvents.Add(new PlayerShootEvent(new Bullet(Pos + Vector2FromAngle(Rotation, -6).GetNormal() 
-                                                                   + Vector2FromAngle(Rotation, 21), Rotation)));
-                gameEvents.Add(new PlayerShootEvent(new Bullet(Pos + Vector2FromAngle(Rotation,  6).GetNormal() 
-                                                                   + Vector2FromAngle(Rotation, 21), Rotation)));
-                ShootCooldown.Reset();
-            }
+            // -- Shoot -- //
+            Weapon.Update(Rotation, gameState, gameInputs, ref gameEvents);
 
             // -- Dash event -- //
             if (gameInputs.Dash && DashCooldown.HasEnded())

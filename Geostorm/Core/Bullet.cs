@@ -8,7 +8,7 @@ namespace Geostorm.Core
     public class Bullet : Entity
     {
         public Bullet() { }
-        public Bullet(Vector2 pos, float rotation) : base(pos, Vector2FromAngle(rotation, 20), rotation, 1) { }
+        public Bullet(Vector2 pos, float rotation) : base(pos, Vector2FromAngle(rotation, 20), rotation) { }
 
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
@@ -19,7 +19,7 @@ namespace Geostorm.Core
             if (-5 > Pos.X || Pos.X > gameState.ScreenSize.X ||
                 -5 > Pos.Y || Pos.Y > gameState.ScreenSize.Y)
             {
-                Health = 0;
+                gameEvents.Add(new BulletDestroyedEvent(this));
             }
         }
     }

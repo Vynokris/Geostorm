@@ -28,9 +28,8 @@ namespace Geostorm.Core
                     {
                         if (CheckEntityCollisions(bullet, enemy, entityVertices)) 
                         {
-                            gameEvents.Add(new EnemyDamagedEvent(enemy, bullet));
-                            if (enemy.Health <= 1)
-                                gameEvents.Add(new EnemyKilledEvent(enemy));
+                            gameEvents.Add(new BulletDestroyedEvent(bullet));
+                            gameEvents.Add(new EnemyKilledEvent(enemy));
                         }
                     }
                 }

@@ -7,13 +7,13 @@ using Geostorm.Utility;
 
 namespace Geostorm.Core
 {
-    public abstract class Enemy : Entity, IEventListener
+    public abstract class Enemy : Entity
     {
         public float PreSpawnDelay { get; private set; } = 0;
         public readonly Cooldown SpawnDelay = new(1);
 
         public Enemy() { }
-        public Enemy(Vector2 pos, float health, float preSpawnDelay = 0) : base(pos, Vector2Create(3, 0), 0, health) 
+        public Enemy(Vector2 pos, float preSpawnDelay = 0) : base(pos, Vector2Create(3, 0), 0) 
         { 
             PreSpawnDelay = preSpawnDelay; 
             SpawnDelay.ChangeDuration(preSpawnDelay); 
@@ -34,17 +34,5 @@ namespace Geostorm.Core
         }
 
         public abstract void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents);
-
-        public void HandleEvents(in List<GameEvent> gameEvents)
-        {
-            foreach (GameEvent Event in gameEvents)
-            {
-                if (Event is EnemyDamagedEvent damageEvent && damageEvent.enemy == this)
-                {
-                    Health -= 1;
-                    break;
-                }
-            }
-        }
     }
 }
