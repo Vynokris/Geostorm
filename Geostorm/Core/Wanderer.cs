@@ -11,7 +11,7 @@ namespace Geostorm.Core
     class Wanderer : Enemy
     {
         public Wanderer() { }
-        public Wanderer(Vector2 pos, float preSpawnDelay = 0) : base(pos, 1, preSpawnDelay) { }
+        public Wanderer(Vector2 pos, float preSpawnDelay = 0) : base(pos, preSpawnDelay) { }
 
         public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {

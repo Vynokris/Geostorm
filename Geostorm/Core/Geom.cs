@@ -47,6 +47,12 @@ namespace Geostorm.Core
             if (DespawnTimer.Update(gameState.DeltaTime))
                 gameEvents.Add(new GeomDespawnEvent(this));
 
+            // Bounce on screen edges.
+            if (0 > Pos.X || Pos.X > gameState.ScreenSize.X)
+                Velocity = new Vector2(-Velocity.X, Velocity.Y);
+            if (0 > Pos.Y || Pos.Y > gameState.ScreenSize.Y)
+                Velocity = new Vector2(Velocity.X, -Velocity.Y);
+
             // Rotate according to rotation speed.
             Rotation += RotationSpeed;
 

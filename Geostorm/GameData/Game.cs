@@ -66,8 +66,6 @@ namespace Geostorm.GameData
             // Handle game events.
             HandleEvents(gameEvents);
             player.HandleEvents(gameEvents);
-            foreach(Enemy enemy in enemies) 
-                enemy.HandleEvents(gameEvents);
 
             // Delete game events.
             gameEvents = null;
@@ -77,12 +75,16 @@ namespace Geostorm.GameData
         {
             foreach (GameEvent Event in gameEvents)
             {
-                if (Event is PlayerShootEvent shootEvent) {
+                if (Event is BulletShotEvent shootEvent) {
                     bullets.Add(shootEvent.bullet);
                 }
 
                 else if (Event.GetType() == typeof(PlayerKilledEvent)) {
                     // TODO: GAME OVER.
+                }
+
+                else if (Event is BulletDestroyedEvent destroyEvent) {
+                    bullets.Remove(destroyEvent.bullet);
                 }
 
                 else if (Event is GeomDespawnEvent despawnEvent) {
@@ -96,10 +98,6 @@ namespace Geostorm.GameData
 
                 else if (Event is EnemySpawnedEvent spawnEvent) {
                     enemies.Add(spawnEvent.enemy);
-                }
-
-                else if (Event is EnemyDamagedEvent damageEvent) {
-                    bullets.Remove(damageEvent.bullet);
                 }
 
                 else if (Event is EnemyKilledEvent killEvent) {

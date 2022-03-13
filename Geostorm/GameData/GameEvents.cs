@@ -15,14 +15,14 @@ namespace Geostorm.GameData
     {
         public Vector2 Pos;
 
-        public PlayerMoveEvent(Vector2 newPos) { Pos = newPos; }
+        public PlayerMoveEvent(in Vector2 newPos) { Pos = newPos; }
     }
 
-    public class PlayerShootEvent : GameEvent
+    public class BulletShotEvent : GameEvent
     {
         public Bullet bullet;
 
-        public PlayerShootEvent(Bullet newBullet) { bullet = newBullet; }
+        public BulletShotEvent(in Bullet newBullet) { bullet = newBullet; }
     }
 
     public class PlayerDashEvent : GameEvent
@@ -37,39 +37,38 @@ namespace Geostorm.GameData
     {
     }
 
+    public class BulletDestroyedEvent : GameEvent
+    {
+        public Bullet bullet;
+
+        public BulletDestroyedEvent(in Bullet destroyedBullet) { bullet = destroyedBullet; }
+    }
+
     public class GeomPickedUpEvent : GameEvent
     {
         public Geom geom;
 
-        public GeomPickedUpEvent(Geom pickedUpGeom) { geom = pickedUpGeom; }
+        public GeomPickedUpEvent(in Geom pickedUpGeom) { geom = pickedUpGeom; }
     }
 
     public class GeomDespawnEvent : GameEvent
     {
         public Geom geom;
 
-        public GeomDespawnEvent(Geom despawnedGeom) { geom = despawnedGeom; }
+        public GeomDespawnEvent(in Geom despawnedGeom) { geom = despawnedGeom; }
     }
 
     public class EnemySpawnedEvent : GameEvent
     {
         public Enemy enemy;
 
-        public EnemySpawnedEvent(Enemy spawnedEnemy) { enemy = spawnedEnemy; }
-    }
-
-    public class EnemyDamagedEvent : GameEvent
-    {
-        public Enemy  enemy;
-        public Bullet bullet;
-
-        public EnemyDamagedEvent(Enemy killedEnemy, Bullet killingBullet) { enemy = killedEnemy; bullet = killingBullet; }
+        public EnemySpawnedEvent(in Enemy spawnedEnemy) { enemy = spawnedEnemy; }
     }
 
     public class EnemyKilledEvent : GameEvent
     {
         public Enemy  enemy;
 
-        public EnemyKilledEvent(Enemy killedEnemy) { enemy = killedEnemy; }
+        public EnemyKilledEvent(in Enemy killedEnemy) { enemy = killedEnemy; }
     }
 }
