@@ -81,57 +81,60 @@ namespace Geostorm.GameData
             // Handle game events.
             HandleEvents(gameEvents);
             player.HandleEvents(gameEvents);
-
-            // Delete game events.
-            gameEvents = null;
         }
 
         public void HandleEvents(in List<GameEvent> gameEvents)
         {
-            foreach (GameEvent Event in gameEvents)
+            foreach (GameEvent gameEvent in gameEvents)
             {
-                if (Event is BulletShotEvent shootEvent) {
-                    bullets.Add(shootEvent.bullet);
-                }
+                switch (gameEvent)
+                {
+                    case PlayerKilledEvent killedEvent:
+                        // TODO: GAME OVER.
+                        break;
 
-                else if (Event.GetType() == typeof(PlayerKilledEvent)) {
-                    // TODO: GAME OVER.
-                }
+                    case BulletShotEvent shootEvent:
+                        bullets.Add(shootEvent.bullet);
+                        break;
 
-                else if (Event is BulletDestroyedEvent destroyEvent) {
-                    bullets.Remove(destroyEvent.bullet);
-                }
+                    case BulletDestroyedEvent destroyEvent:
+                        bullets.Remove(destroyEvent.bullet);
+                        break;
 
-                else if (Event is GeomDespawnEvent despawnEvent) {
-                    geoms.Remove(despawnEvent.geom);
-                }
+                    case GeomDespawnEvent despawnEvent:
+                        geoms.Remove(despawnEvent.geom);
+                        break;
 
-                else if (Event is GeomPickedUpEvent pickupEvent) {
-                    geoms.Remove(pickupEvent.geom);
-                    Multiplier++;
-                }
+                    case GeomPickedUpEvent pickupEvent:
+                        geoms.Remove(pickupEvent.geom);
+                        Multiplier++;
+                        break;
 
-                else if (Event is EnemySpawnedEvent spawnEvent) {
-                    enemies.Add(spawnEvent.enemy);
-                }
+                    case EnemySpawnedEvent spawnEvent:
+                        enemies.Add(spawnEvent.enemy);
+                        break;
 
-                else if (Event is EnemyKilledEvent killEvent) {
-                    enemies.Remove(killEvent.enemy);
-                    Score++;
+                    case EnemyKilledEvent killEvent:
+                        enemies.Remove(killEvent.enemy);
+                        Score++;
 
-                    System.Random rng = new();
-                    for (int i = 0; i < rng.Next(1, 2); i++) {
-                        geoms.Add(new Geom(killEvent.enemy.Pos));
-                    }
-                }
+                        System.Random rng = new();
+                        for (int i = 0; i < rng.Next(1, 2); i++) {
+                            geoms.Add(new Geom(killEvent.enemy.Pos));
+                        }
+                        break;
 
-                else if (Event is ParticleSpawnedEvent particleSpawnEvent) { 
-                    particles.Add(particleSpawnEvent.particle);
-                }
+                    case ParticleSpawnedEvent particleSpawnEvent:
+                        particles.Add(particleSpawnEvent.particle);
+                        break;
 
-                else if (Event is ParticleDespawnEvent particleDespawnEvent) { 
-                    particles.Remove(particleDespawnEvent.particle);
-                }
+                    case ParticleDespawnEvent particleDespawnEvent:
+                        particles.Remove(particleDespawnEvent.particle);
+                        break;
+
+                    default: 
+                        break;
+                }    
             }
         }
 

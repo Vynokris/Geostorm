@@ -2,7 +2,6 @@
 using System.Numerics;
 using System.Collections.Generic;
 
-using static MyMathLib.Colors;
 using static MyMathLib.Geometry2D;
 
 using Geostorm.Core;
@@ -12,15 +11,17 @@ namespace Geostorm.Renderer
 {
     public class EntityVertices
     {
-        public Vector2[] CursorVertices   = new Vector2[8];
-        public Vector2[] PlayerVertices   = new Vector2[9];
-        public Vector2[] BulletVertices   = new Vector2[5];
-        public Vector2[] GeomVertices     = new Vector2[5];
-        public Vector2[] WandererVertices = new Vector2[14];
-        public Vector2[] RocketVertices   = new Vector2[7];
-        public Vector2[] GruntVertices    = new Vector2[5];
-        public Vector2[] WeaverVertices   = new Vector2[10];
-        public Vector2[] ParticleVertices = new Vector2[2];
+        public Vector2[] CursorVertices    = new Vector2[8];
+        public Vector2[] PlayerVertices    = new Vector2[9];
+        public Vector2[] BulletVertices    = new Vector2[5];
+        public Vector2[] GeomVertices      = new Vector2[5];
+        public Vector2[] WandererVertices  = new Vector2[14];
+        public Vector2[] RocketVertices    = new Vector2[7];
+        public Vector2[] GruntVertices     = new Vector2[5];
+        public Vector2[] WeaverVertices    = new Vector2[10];
+        public Vector2[] SnakeHeadVertices = new Vector2[6];
+        public Vector2[] SnakeBodyVertices = new Vector2[4];
+        public Vector2[] ParticleVertices  = new Vector2[2];
 
         public EntityVertices()
         {
@@ -104,7 +105,7 @@ namespace Geostorm.Renderer
 
             // Load grunt vertices.
             {
-                float preScale = 18;
+                float preScale = 20;
                 GruntVertices[0] = new Vector2(-1.0f, 0.0f) * preScale;
                 GruntVertices[1] = new Vector2( 0.0f,-1.0f) * preScale;
                 GruntVertices[2] = new Vector2( 1.0f, 0.0f) * preScale;
@@ -125,6 +126,21 @@ namespace Geostorm.Renderer
                 WeaverVertices[7] = new Vector2( 0,  1) * preScale;
                 WeaverVertices[8] = new Vector2( 1,  0) * preScale;
                 WeaverVertices[9] = new Vector2( 1, -1) * preScale;
+            }
+
+            // Load snake vertices.
+            {
+                float preScale = 18;
+                SnakeHeadVertices[0] = new Vector2( 1.0f, 0.0f ) * preScale;
+                SnakeHeadVertices[1] = new Vector2(-0.5f,-0.75f) * preScale;
+                SnakeHeadVertices[2] = new Vector2(-1.0f,-0.5f ) * preScale;
+                SnakeHeadVertices[3] = new Vector2(-1.0f, 0.5f ) * preScale;
+                SnakeHeadVertices[4] = new Vector2(-0.5f, 0.75f) * preScale;
+                SnakeHeadVertices[5] = new Vector2( 1.0f, 0.0f ) * preScale;
+                SnakeBodyVertices[0] = new Vector2( 1.0f, 0.0f ) * preScale;
+                SnakeBodyVertices[1] = new Vector2(-1.0f, 0.5f ) * preScale;
+                SnakeBodyVertices[2] = new Vector2(-1.0f,-0.5f ) * preScale;
+                SnakeBodyVertices[3] = new Vector2( 1.0f, 0.0f ) * preScale;
             }
 
             // Load particle vertices.
@@ -162,6 +178,12 @@ namespace Geostorm.Renderer
             else if (entityType == typeof(Weaver)) {
                 vertices = (Vector2[])WeaverVertices.Clone();
             }
+            else if (entityType == typeof(Snake)) {
+                vertices = (Vector2[])SnakeHeadVertices.Clone();
+            }
+            else if (entityType == typeof(SnakeBodyPart)) {
+                vertices = (Vector2[])SnakeBodyVertices.Clone();
+            }
             else if (entityType == typeof(Particle)) {
                 vertices = (Vector2[])ParticleVertices.Clone();
             }
@@ -183,7 +205,7 @@ namespace Geostorm.Renderer
             for (int i = 0; i < vertices.Length-1; i++)
             {
                 output.Add(vertices[i]);
-                output.Add(Point2Lerp(1-spawnDelay.CompletionRatio(), vertices[i], vertices[i+1]));
+                output.Add(Point2Lerp(1 - spawnDelay.CompletionRatio(), vertices[i], vertices[i+1]));
             }
 
             return output.ToArray();

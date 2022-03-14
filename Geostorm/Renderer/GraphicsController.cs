@@ -230,17 +230,17 @@ namespace Geostorm.Renderer
                 { 
                     // Draw the blurred texture.
                     Raylib.DrawTextureRec(BlurTextures[0].texture,
-                                            new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
-                                            new Vector2  (0, 0),
-                                            Color.WHITE);
+                                          new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
+                                          new Vector2  (0, 0),
+                                          Color.WHITE);
                     
                     // Draw the non-black pixels of the original texture.
                     Raylib.BeginShaderMode(NonBlackMaskShader);
                     { 
                         Raylib.DrawTextureRec(RenderTexture.texture,
-                                                new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
-                                                new Vector2  (0, 0),
-                                                Color.WHITE);
+                                              new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
+                                              new Vector2  (0, 0),
+                                              Color.WHITE);
                     }
                     Raylib.EndShaderMode();
                 }
@@ -277,7 +277,7 @@ namespace Geostorm.Renderer
                 }
             }
 
-            // Make the geoms blink 3 times in 100 frames before they despawn.
+            // Make the geoms blink a few times before they despawn.
             if (entity is Geom geom)
             {
                 if (geom.DespawnTimer.Counter * 60 <= 40 && (int)(geom.DespawnTimer.Counter * 6) % 2 == 1)
@@ -285,11 +285,28 @@ namespace Geostorm.Renderer
             }
 
             // Draw the spawn animation for enemies.
-            if (entity is Enemy enemy && !enemy.SpawnDelay.HasEnded())
+            if (entity is Enemy enemy)
             {
-                if (enemy.PreSpawnDelay == 0)
+                if (enemy.PreSpawnDelay > 0)
+                    return;
+
+                if (!enemy.SpawnDelay.HasEnded()) 
+                { 
                     DrawLines(entityVertices.GetEntitySpawnAnimation(enemy, enemy.SpawnDelay), entity.Color, true);
-                return;
+
+                    // Draw the spawn animation for snakes.
+                    if (enemy is Snake snakeEnemy)
+                        foreach (SnakeBodyPart bodyPart in snakeEnemy.BodyParts)
+                            DrawLines(entityVertices.GetEntitySpawnAnimation(bodyPart, enemy.SpawnDelay), bodyPart.Color, true);
+                    return;
+                }
+            }
+
+            // Draw the body parts of snakes.
+            if (entity is Snake snake && snake.SpawnDelay.HasEnded())
+            {
+                foreach (SnakeBodyPart bodyPart in snake.BodyParts)
+                    DrawEntity(bodyPart, entityVertices);
             }
 
             // Draw circles for the stars.

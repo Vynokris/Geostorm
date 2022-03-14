@@ -19,11 +19,28 @@ namespace Geostorm.Utility
                 if (enemy.SpawnDelay.Counter <= 0)
                 { 
                     // Check collisions between player and enemies.
-                    if (player.Invincibility.HasEnded() && CheckEntityCollisions(player, enemy, entityVertices)) 
+                    if (player.Invincibility.HasEnded()) 
                     { 
-                        gameEvents.Add(new PlayerDamagedEvent());
-                        if (player.Health <= 1)
-                            gameEvents.Add(new PlayerKilledEvent());
+                        if (CheckEntityCollisions(player, enemy, entityVertices)) 
+                        { 
+                            gameEvents.Add(new PlayerDamagedEvent());
+                            if (player.Health <= 1)
+                                gameEvents.Add(new PlayerKilledEvent());
+                        }
+
+                        // Check collisions between player and snake body parts.
+                        if (enemy is Snake snake)
+                        {
+                            foreach (SnakeBodyPart bodyPart in snake.BodyParts) {
+                                if (CheckEntityCollisions(player, bodyPart, entityVertices)) 
+                                { 
+                                    gameEvents.Add(new BounceOnSnakeBodyEvent(bodyPart));
+                                    gameEvents.Add(new PlayerDamagedEvent());
+                                    if (player.Health <= 1)
+                                        gameEvents.Add(new PlayerKilledEvent());
+                                }
+                            }
+                        }
                     }
                     
                     // Check collisions between bullets and enemies.
@@ -33,6 +50,18 @@ namespace Geostorm.Utility
                         {
                             gameEvents.Add(new BulletDestroyedEvent(bullet));
                             gameEvents.Add(new EnemyKilledEvent(enemy));
+                        }
+
+                        // Check collisions between bullets and snake body parts.
+                        if (enemy is Snake snake)
+                        {
+                            foreach (SnakeBodyPart bodyPart in snake.BodyParts) {
+                                if (CheckEntityCollisions(bullet, bodyPart, entityVertices)) 
+                                { 
+                                    gameEvents.Add(new BulletDestroyedEvent(bullet));
+                                    gameEvents.Add(new SnakeBodyPartHitEvent(bodyPart));
+                                }
+                            }
                         }
                     }
                 }

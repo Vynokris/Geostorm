@@ -72,6 +72,20 @@ namespace Geostorm.GameData
         public EnemyKilledEvent(in Enemy killedEnemy) { enemy = killedEnemy; }
     }
 
+    public class BounceOnSnakeBodyEvent : GameEvent
+    {
+        public SnakeBodyPart snakeBodyPart;
+
+        public BounceOnSnakeBodyEvent(in SnakeBodyPart bodyPart) { snakeBodyPart = bodyPart; }
+    }
+
+    public class SnakeBodyPartHitEvent : GameEvent
+    {
+        public SnakeBodyPart snakeBodyPart;
+
+        public SnakeBodyPartHitEvent(in SnakeBodyPart bodyPart) { snakeBodyPart = bodyPart; }
+    }
+
     public class ParticleSpawnedEvent : GameEvent
     {
         public Particle particle;
