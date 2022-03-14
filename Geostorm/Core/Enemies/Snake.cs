@@ -44,12 +44,16 @@ namespace Geostorm.Core
         public List<SnakeBodyPart> BodyParts = new();
 
         public Snake() { }
-        public Snake(Vector2 pos, float preSpawnDelay = 0) : base(pos, new RGBA(0.51f, 0.47f, 0.9f, 1f), preSpawnDelay) 
+        public Snake(Vector2 pos, float preSpawnDelay = 0, int minLen = 0, int maxLen = 0) : base(pos, new RGBA(0.51f, 0.47f, 0.9f, 1f), preSpawnDelay) 
         {
             System.Random rng = new();
             Rotation = 0;
             Velocity = Vector2Create(3, 0);
-            BodyPartsCount = rng.Next(10, 15);
+
+            if (minLen == 0 && maxLen == 0)
+                BodyPartsCount = rng.Next(10, 15);
+            else
+                BodyPartsCount = rng.Next(minLen, maxLen);
 
             // Initialize the body parts.
             for (int i = 0; i < BodyPartsCount; i++) { 

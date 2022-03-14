@@ -18,6 +18,8 @@ namespace Geostorm.Renderer
         public int ScreenWidth  { get; private set; } = 1920;
         public int ScreenHeight { get; private set; } = 1080;
 
+        public bool mouseCursorHidden = true;
+
         private Shader GaussianBlurShader;
         private Shader NonBlackMaskShader;
         private Shader ChromaticAberrationShader;
@@ -143,6 +145,13 @@ namespace Geostorm.Renderer
                 // Get the shooting target.
                 inputs.ShootTarget = Raylib.GetMousePosition();
                 inputs.ShootDir    = Vector2Zero();
+
+                // Get the cheat toggle input.
+                if (Raylib.IsKeyDown   (KeyboardKey.KEY_LEFT_ALT) &&
+                    Raylib.IsKeyPressed(KeyboardKey.KEY_C))
+                {
+                    inputs.CheatMenu = true;
+                }
             }
             else
             { 
@@ -158,11 +167,18 @@ namespace Geostorm.Renderer
                 inputs.Shoot = Raylib.IsGamepadButtonDown(0, GamepadButton.GAMEPAD_BUTTON_RIGHT_TRIGGER_1) ||
                                Raylib.IsGamepadButtonDown(0, GamepadButton.GAMEPAD_BUTTON_RIGHT_TRIGGER_2);
 
-                // Get The shooting direction.
+                // Get the shooting direction.
                 inputs.ShootTarget = Vector2Create(-1, -1);
                 inputs.ShootDir    = Vector2Create(Raylib.GetGamepadAxisMovement(0, GamepadAxis.GAMEPAD_AXIS_RIGHT_X),
                                                    Raylib.GetGamepadAxisMovement(0, GamepadAxis.GAMEPAD_AXIS_RIGHT_Y));
                 inputs.ShootDir.Normalize();
+
+                // Get the cheat toggle input.
+                if (Raylib.IsGamepadButtonDown   (0, GamepadButton.GAMEPAD_BUTTON_MIDDLE_LEFT) &&
+                    Raylib.IsGamepadButtonPressed(0, GamepadButton.GAMEPAD_BUTTON_MIDDLE_RIGHT))
+                {
+                    inputs.CheatMenu = true;
+                }
             }
 
             return inputs;
@@ -173,7 +189,8 @@ namespace Geostorm.Renderer
 
         public void BeginDrawing()
         {
-            Raylib.HideCursor();
+            if (mouseCursorHidden)
+                Raylib.HideCursor();
             Raylib.BeginTextureMode(RenderTexture);
             Raylib.ClearBackground(Color.BLACK);
         }

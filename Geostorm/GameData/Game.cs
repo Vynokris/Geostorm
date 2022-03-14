@@ -13,8 +13,7 @@ namespace Geostorm.GameData
         public int Score      { get; private set; } = 0;
         public int Multiplier { get; private set; } = 1;
 
-        public int StarCount     = 100;
-        public int ParticleCount = 1000;
+        public int StarCount = 100;
         public List<Star>     stars     = new();
         public List<Particle> particles = new(); 
 

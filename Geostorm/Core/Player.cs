@@ -14,8 +14,8 @@ namespace Geostorm.Core
     {
         public           int      Health        = 3;
         public  readonly Weapon   Weapon        = new();
-        private readonly Cooldown DashCooldown  = new(0.30f);
-        private readonly Cooldown DashingFrames = new(0.25f);
+        private readonly Cooldown DashCooldown  = new(0.50f);
+        public  readonly Cooldown DashDuration  = new(0.25f);
         public  readonly Cooldown Invincibility = new(3);
         private readonly int      MaxVelocity   = 10;
         private readonly int      DashVelocity  = 50;
@@ -27,7 +27,7 @@ namespace Geostorm.Core
         {
             // Update the player's cooldowns.
             DashCooldown .Update(gameState.DeltaTime);
-            DashingFrames.Update(gameState.DeltaTime);
+            DashDuration.Update(gameState.DeltaTime);
             Invincibility.Update(gameState.DeltaTime);
 
             // -- Accelerate -- //
@@ -40,7 +40,7 @@ namespace Geostorm.Core
                 float dirAngle = gameInputs.Movement.GetAngle();
 
                 // Initiate a dash by going at dashing velocity in the moving dir.
-                if (DashingFrames.CompletionRatio() >= 0.9f)
+                if (DashDuration.CompletionRatio() >= 0.9f)
                     Velocity = Vector2FromAngle(dirAngle, DashVelocity);
 
                 // If the player is under the maximum velocity, make him accelerate.
@@ -48,7 +48,7 @@ namespace Geostorm.Core
                     Velocity += Vector2FromAngle(dirAngle, 0.6f);
 
                 // If the player is at maximum velocity, stop accelerating.
-                else if (DashingFrames.HasEnded())
+                else if (DashDuration.HasEnded())
                     Velocity = Velocity * 0.7f + Vector2FromAngle(dirAngle, 0.3f);
             }
 
@@ -59,9 +59,9 @@ namespace Geostorm.Core
             }
 
             // -- Dash slow down -- //
-            if (!DashingFrames.HasEnded() && Velocity.Length() > MaxVelocity)
+            if (!DashDuration.HasEnded() && Velocity.Length() > MaxVelocity)
             {
-                Velocity = Velocity.GetModifiedLength(ClampAbove(DashVelocity * DashingFrames.CompletionRatio(), MaxVelocity));
+                Velocity = Velocity.GetModifiedLength(ClampAbove(DashVelocity * DashDuration.CompletionRatio(), MaxVelocity));
             }
 
             // -- Turn -- //
@@ -82,7 +82,7 @@ namespace Geostorm.Core
             {
                 gameEvents.Add(new PlayerDashEvent());
                 DashCooldown.Reset();
-                DashingFrames.Reset();
+                DashDuration.Reset();
             }
 
             // Move the player according to its velocity.
