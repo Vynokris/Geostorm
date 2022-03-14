@@ -27,6 +27,9 @@ namespace MyMathLib
 
         // Converts the given angle from radians to degrees.
         public static float RadToDeg(float rad) { return rad * (180f / (float)PI); }
+        
+        // Clamps the given value between the maximum and minimum values.
+        public static float Clamp(float val, float min, float max)  { if (val > max) val = max; if (val < min) val = min; return val; }
 
         // Clamps the given value to be inferior or equal to the maximum value.
         public static float ClampUnder(float val, float max)        { if (val > max) val = max; return val; }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using System.Collections.Generic;
-using static System.MathF;
 
 using Raylib_cs;
 using static MyMathLib.Arithmetic;
@@ -96,10 +94,10 @@ namespace Geostorm.Renderer
 
         public static Color RGBAtoRayCol(RGBA rgba) 
         {
-            return new Color((int)(rgba.R*255.0), 
-                             (int)(rgba.G*255.0), 
-                             (int)(rgba.B*255.0), 
-                             (int)(rgba.A*255.0)); 
+            return new Color((int)Clamp(rgba.R*255f, 0, 255), 
+                             (int)Clamp(rgba.G*255f, 0, 255), 
+                             (int)Clamp(rgba.B*255f, 0, 255), 
+                             (int)Clamp(rgba.A*255f, 0, 255)); 
         }
 
 
@@ -224,18 +222,19 @@ namespace Geostorm.Renderer
 
             ApplyBloom();
 
-            // Draw the render texture and the blurred texture on the screen.
             Raylib.BeginDrawing();
             {
                 Raylib.ClearBackground(Color.BLACK);
                 
                 Raylib.BeginShaderMode(ChromaticAberrationShader);
                 { 
+                    // Draw the blurred texture.
                     Raylib.DrawTextureRec(BlurTextures[0].texture,
                                             new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
                                             new Vector2  (0, 0),
                                             Color.WHITE);
-                
+                    
+                    // Draw the non-black pixels of the original texture.
                     Raylib.BeginShaderMode(NonBlackMaskShader);
                     { 
                         Raylib.DrawTextureRec(RenderTexture.texture,
@@ -261,8 +260,7 @@ namespace Geostorm.Renderer
         {
             Vector2[] vertices    = entityVertices.GetEntityVertices(entity);
             int       vertexCount = vertices.Length;
-            RGBA      rgbaColor   = entityVertices.GetEntityColor(entity);
-            Color     color       = RGBAtoRayCol(rgbaColor);
+            Color     color       = RGBAtoRayCol(entity.Color);
 
             // Draw the player's shield.
             if (entity is Player player)
@@ -290,7 +288,7 @@ namespace Geostorm.Renderer
             if (entity is Enemy enemy && !enemy.SpawnDelay.HasEnded())
             {
                 if (enemy.PreSpawnDelay == 0)
-                    DrawLines(entityVertices.GetEntitySpawnAnimation(enemy, enemy.SpawnDelay), rgbaColor, true);
+                    DrawLines(entityVertices.GetEntitySpawnAnimation(enemy, enemy.SpawnDelay), entity.Color, true);
                 return;
             }
 

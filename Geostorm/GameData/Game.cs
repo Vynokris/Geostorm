@@ -1,7 +1,10 @@
-﻿using Geostorm.Core;
-using Geostorm.Renderer;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+
 using static MyMathLib.Geometry2D;
+
+using Geostorm.Core;
+using Geostorm.Renderer;
+using Geostorm.Utility;
 
 namespace Geostorm.GameData
 {
@@ -10,12 +13,19 @@ namespace Geostorm.GameData
         public int Score      { get; private set; } = 0;
         public int Multiplier { get; private set; } = 1;
 
+        public int StarCount     = 100;
+        public int ParticleCount = 1000;
+        public List<Star>     stars     = new();
+        public List<Particle> particles = new(); 
+
         public Player       player;
         public List<Bullet> bullets = new();
         public List<Geom>   geoms   = new();
-        public List<Star>   stars   = new();
         public List<Enemy>  enemies = new();
-        public EnemySpawner spawner = new();
+
+        public EnemySpawner    enemySpawner    = new();
+        public ParticleSpawner particleSpawner = new();
+
 
         public readonly EntityVertices entityVertices = new();
 
@@ -23,8 +33,7 @@ namespace Geostorm.GameData
         {
             player = new(Vector2Create(screenW/2, screenH/2));
 
-            int StarsCount = 100;
-            for (int i = 0; i < StarsCount; i++)
+            for (int i = 0; i < StarCount; i++)
                 stars.Add(new Star(screenW, screenH));
         }
 
@@ -46,6 +55,10 @@ namespace Geostorm.GameData
             foreach (Star star in stars)
                 star.Update(gameState, gameInputs, ref gameEvents);
 
+            // Update the particles.
+            foreach (Particle particle in particles)
+                particle.Update(gameState, gameInputs, ref gameEvents);
+
             // Update the player.
             player.Update(gameState, gameInputs, ref gameEvents);
 
@@ -61,8 +74,9 @@ namespace Geostorm.GameData
             foreach (Enemy enemy in enemies)
                 enemy.Update(gameState, gameInputs, ref gameEvents);
 
-            // Update the enemy spawner.
-            spawner.Update(gameState, ref gameEvents);
+            // Update the entity spawners.
+            enemySpawner.Update(gameState, ref gameEvents);
+            particleSpawner.Update(ref gameEvents);
 
             // Handle game events.
             HandleEvents(gameEvents);
@@ -110,6 +124,14 @@ namespace Geostorm.GameData
                         geoms.Add(new Geom(killEvent.enemy.Pos));
                     }
                 }
+
+                else if (Event is ParticleSpawnedEvent particleSpawnEvent) { 
+                    particles.Add(particleSpawnEvent.particle);
+                }
+
+                else if (Event is ParticleDespawnEvent particleDespawnEvent) { 
+                    particles.Remove(particleDespawnEvent.particle);
+                }
             }
         }
 
@@ -118,6 +140,10 @@ namespace Geostorm.GameData
             // Draw the stars in the background.
             foreach (Star star in stars)
                 graphicsController.DrawEntity(star, entityVertices);
+
+            // Draw the particles.
+            foreach (Particle particle in particles)
+                graphicsController.DrawEntity(particle, entityVertices);
 
             // Draw the enemies and their spawn animations.
             foreach (Enemy  enemy  in enemies) 

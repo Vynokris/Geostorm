@@ -1,9 +1,8 @@
 ﻿using System.Numerics;
 using System.Collections.Generic;
 
-using static System.MathF;
 using static MyMathLib.Geometry2D;
-using static MyMathLib.Arithmetic;
+using static MyMathLib.Colors;
 
 using Geostorm.GameData;
 
@@ -12,7 +11,7 @@ namespace Geostorm.Core
     public class Weaver : Enemy
     {
         public Weaver() { }
-        public Weaver(Vector2 pos, float preSpawnDelay = 0) : base(pos, preSpawnDelay, 3) { }
+        public Weaver(Vector2 pos, float preSpawnDelay = 0) : base(pos, new RGBA(0, 1, 0, 1), preSpawnDelay, 3) { }
 
         public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
@@ -42,9 +41,9 @@ namespace Geostorm.Core
 
                     // Decide which direction to doge in.
                     if (angle < 0)
-                        Velocity = trueVelocity.GetNormal() * -2;
+                        Velocity = trueVelocity.GetNormal() * -1.75f;
                     else
-                        Velocity = trueVelocity.GetNormal() *  2;
+                        Velocity = trueVelocity.GetNormal() *  1.75f;
                 }
             }
 
