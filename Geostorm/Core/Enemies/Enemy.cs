@@ -14,7 +14,7 @@ namespace Geostorm.Core
         public float VelocityLength = 3;
 
         public Enemy() { }
-        public Enemy(Vector2 pos, float preSpawnDelay = 0, float speed = 3) : base(pos, Vector2Create(3, 0), 0) 
+        public Enemy(Vector2 pos, RGBA color, float preSpawnDelay = 0, float speed = 3) : base(pos, Vector2Create(3, 0), 0, color) 
         { 
             PreSpawnDelay = preSpawnDelay; 
             SpawnDelay.ChangeDuration(preSpawnDelay); 

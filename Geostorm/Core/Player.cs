@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
 using System.Collections.Generic;
 
-using static System.MathF;
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
+using static MyMathLib.Colors;
 
 using Geostorm.Utility;
 using Geostorm.GameData;
@@ -20,9 +20,8 @@ namespace Geostorm.Core
         private readonly int      MaxVelocity   = 10;
         private readonly int      DashVelocity  = 50;
 
-        public Player() { }
-        public Player(Vector2 pos)                                   : base(pos, Vector2Zero(), 0)        { }
-        public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity,      rotation) { }
+        public Player(Vector2 pos)                                   : base(pos, Vector2Zero(), 0,        new RGBA(1, 1, 1, 1)) { }
+        public Player(Vector2 pos, Vector2 velocity, float rotation) : base(pos, velocity,      rotation, new RGBA(1, 1, 1, 1)) { }
 
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {

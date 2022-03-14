@@ -67,8 +67,22 @@ namespace Geostorm.GameData
 
     public class EnemyKilledEvent : GameEvent
     {
-        public Enemy  enemy;
+        public Enemy enemy;
 
         public EnemyKilledEvent(in Enemy killedEnemy) { enemy = killedEnemy; }
+    }
+
+    public class ParticleSpawnedEvent : GameEvent
+    {
+        public Particle particle;
+
+        public ParticleSpawnedEvent(in Particle spawnedParticle) { particle = spawnedParticle; }
+    }
+
+    public class ParticleDespawnEvent : GameEvent
+    {
+        public Particle particle;
+
+        public ParticleDespawnEvent(in Particle despawnedParticle) { particle = despawnedParticle; }
     }
 }

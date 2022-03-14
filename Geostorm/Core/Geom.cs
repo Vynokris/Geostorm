@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
+using static MyMathLib.Colors;
 
 using Geostorm.GameData;
 using Geostorm.Utility;
@@ -22,6 +23,7 @@ namespace Geostorm.Core
             Rotation = DegToRad(rnd.Next(0, 360));
             RotationSpeed = DegToRad(rnd.Next(1, 5));
             Velocity = Vector2FromAngle(Rotation, 2.5f);
+            Color = new RGBA(0.54f, 0.68f, 0.33f, 1);
         }
 
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)

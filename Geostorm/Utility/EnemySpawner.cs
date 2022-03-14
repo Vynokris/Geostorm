@@ -1,9 +1,10 @@
-﻿using Geostorm.Utility;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Collections.Generic;
+
+using Geostorm.Core;
 using Geostorm.GameData;
 
-namespace Geostorm.Core
+namespace Geostorm.Utility
 {
     public class EnemySpawner
     {

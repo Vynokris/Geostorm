@@ -12,13 +12,6 @@ namespace Geostorm.Renderer
 {
     public class EntityVertices
     {
-        public RGBA PlayerColor   = new(1, 1, 1, 1);
-        public RGBA BulletColor   = new(1, 1, 0, 1);
-        public RGBA GeomColor     = new(0.54f, 0.68f, 0.33f, 1);
-        public RGBA WandererColor = new(1, 0, 1, 1);
-        public RGBA GruntColor    = new(0, 1, 1, 1);
-        public RGBA WeaverColor   = new(0, 1, 0, 1);
-
         public Vector2[] CursorVertices   = new Vector2[8];
         public Vector2[] PlayerVertices   = new Vector2[9];
         public Vector2[] BulletVertices   = new Vector2[5];
@@ -26,6 +19,7 @@ namespace Geostorm.Renderer
         public Vector2[] WandererVertices = new Vector2[14];
         public Vector2[] GruntVertices    = new Vector2[5];
         public Vector2[] WeaverVertices   = new Vector2[10];
+        public Vector2[] ParticleVertices = new Vector2[2];
 
         public EntityVertices()
         {
@@ -119,6 +113,13 @@ namespace Geostorm.Renderer
                 WeaverVertices[8] = new Vector2( 1,  0) * preScale;
                 WeaverVertices[9] = new Vector2( 1, -1) * preScale;
             }
+
+            // Load particle vertices.
+            {
+                float preScale = 10;
+                ParticleVertices[0] = new Vector2( 1, 0) * preScale;
+                ParticleVertices[1] = new Vector2(-1, 0) * preScale;
+            }
         }
 
         public Vector2[] GetEntityVertices<T>(T entity) where T : IEntity
@@ -145,10 +146,13 @@ namespace Geostorm.Renderer
             else if (entityType == typeof(Weaver)) {
                 vertices = (Vector2[])WeaverVertices.Clone();
             }
+            else if (entityType == typeof(Particle)) {
+                vertices = (Vector2[])ParticleVertices.Clone();
+            }
 
             // Transform the entity's vertices to screen positions.
             for (int i = 0; i < vertices.Length; i++)
-                vertices[i] = vertices[i].GetRotatedAsPoint(entity.Rotation, Vector2Zero()) + entity.Pos;
+                vertices[i] = vertices[i].GetScaledAsPoint(entity.Scale, Vector2Zero()).GetRotatedAsPoint(entity.Rotation, Vector2Zero()) + entity.Pos;
 
             return vertices;
         }
@@ -169,6 +173,7 @@ namespace Geostorm.Renderer
             return output.ToArray();
         }
 
+        /*
         public RGBA GetEntityColor<T>(T entity) where T : IEntity
         {
             Type entityType = entity.GetType();
@@ -190,8 +195,12 @@ namespace Geostorm.Renderer
             else if (entityType == typeof(Weaver)) {
                 color = WeaverColor;
             }
+            else if (entity is Particle particle) { 
+                color = particle.Color;
+            }
 
             return color;
         }
+        */
     }
 }

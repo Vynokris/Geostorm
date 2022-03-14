@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Collections.Generic;
 using static MyMathLib.Geometry2D;
+using static MyMathLib.Colors;
 using Geostorm.GameData;
 
 namespace Geostorm.Core
@@ -8,7 +9,7 @@ namespace Geostorm.Core
     public class Bullet : Entity
     {
         public Bullet() { }
-        public Bullet(Vector2 pos, float rotation) : base(pos, Vector2FromAngle(rotation, 20), rotation) { }
+        public Bullet(Vector2 pos, float rotation) : base(pos, Vector2FromAngle(rotation, 20), rotation, new RGBA(1, 1, 0, 1)) { }
 
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {

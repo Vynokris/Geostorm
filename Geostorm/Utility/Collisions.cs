@@ -1,11 +1,14 @@
 ﻿using System.Numerics;
 using System.Collections.Generic;
+
 using static MyMathLib.Geometry2D;
 using static MyMathLib.Collisions2D;
-using Geostorm.Renderer;
-using Geostorm.GameData;
 
-namespace Geostorm.Core
+using Geostorm.Core;
+using Geostorm.GameData;
+using Geostorm.Renderer;
+
+namespace Geostorm.Utility
 {
     public static class Collisions
     {

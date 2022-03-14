@@ -12,7 +12,6 @@ namespace Geostorm.Core
     public class Star : Entity
     {
         public int  Radius { get; private set; } = 0;
-        public RGBA Color  { get; private set; } = new(0, 0, 0, 0);
 
         public Star(int screenW, int screenH)
         {

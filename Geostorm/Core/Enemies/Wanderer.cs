@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using static System.MathF;
 using static MyMathLib.Geometry2D;
+using static MyMathLib.Colors;
 
 using Geostorm.GameData;
 
@@ -11,7 +12,7 @@ namespace Geostorm.Core
     class Wanderer : Enemy
     {
         public Wanderer() { }
-        public Wanderer(Vector2 pos, float preSpawnDelay = 0) : base(pos, preSpawnDelay) { }
+        public Wanderer(Vector2 pos, float preSpawnDelay = 0) : base(pos, new RGBA(1, 0, 1, 1), preSpawnDelay) { }
 
         public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
