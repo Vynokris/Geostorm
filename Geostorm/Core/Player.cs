@@ -118,7 +118,11 @@ namespace Geostorm.Core
                 if (Event.GetType() == typeof(PlayerDamagedEvent)) {
                     Health -= 1;
                     Invincibility.Reset();
-                    break;
+                }
+
+                if (Event is BounceOnSnakeBodyEvent bounceEvent) { 
+                    Vector2 surfaceNormal = Vector2FromSegment(bounceEvent.snakeBodyPart.DirectorSegment).GetNormalized().GetNormal();
+                    Velocity = surfaceNormal * Velocity.Length() * -SignOf(Velocity.Dot(surfaceNormal));
                 }
             }
         }

@@ -10,7 +10,7 @@ namespace Geostorm.Utility
     public class EnemySpawner
     {
         private System.Random RandomGen = new();
-        private Cooldown SpawnCooldown  = new(1);
+        private Cooldown SpawnCooldown  = new(0);
 
         public EnemySpawner() { }
 
@@ -19,7 +19,7 @@ namespace Geostorm.Utility
             if (SpawnCooldown.Update(gameState.DeltaTime))
             {
                 // TODO: change cooldown according to game duration.
-                SpawnCooldown.ChangeDuration(RandomGen.Next() % 2);
+                SpawnCooldown.ChangeDuration(RandomGen.Next() % 2 + 1);
                 for (int i = 0; i < RandomGen.Next(1, 3); i++)
                     SpawnRandomEnemy(gameState, ref gameEvents);
             }
@@ -28,8 +28,8 @@ namespace Geostorm.Utility
         public void SpawnRandomEnemy(in GameState gameState, ref List<GameEvent> gameEvents)
         {
             // Chance percentages for random enemy type.
-            Type[] enemyTypes   = new Type[] { typeof(Wanderer), typeof(Rocket), typeof(Grunt), typeof(Weaver) };
-            int[]  enemyChances = new int[]  { 35,               20,             30,            15             };
+            Type[] enemyTypes   = new Type[] { typeof(Wanderer), typeof(Rocket), typeof(Grunt), typeof(Weaver), typeof(Snake) };
+            int[]  enemyChances = new int[]  { 30,               20,             25,            15            , 10 };
             int    totalChance  = 0;
 
             int randInt = RandomGen.Next() % 100;
@@ -60,6 +60,9 @@ namespace Geostorm.Utility
             }
             else if (enemyType == typeof(Weaver)) {
                 gameEvents.Add(new EnemySpawnedEvent(new Weaver  (pos, preSpawnDelay)));
+            }
+            else if (enemyType == typeof(Snake)) { 
+                gameEvents.Add(new EnemySpawnedEvent(new Snake   (pos, preSpawnDelay)));
             }
         }
     }

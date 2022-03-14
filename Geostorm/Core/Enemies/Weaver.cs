@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Collections.Generic;
 
+using static System.MathF;
 using static MyMathLib.Geometry2D;
 using static MyMathLib.Colors;
 
@@ -33,17 +34,21 @@ namespace Geostorm.Core
                 if (bulletDist < 200 && bulletDist < closestBulletDist
                 && closestBulletPos.GetDistanceFromPoint(bullet.Pos) > 20)
                 {
-                    closestBulletPos  = bullet.Pos;
-                    closestBulletDist = bulletDist;
-
                     // Get the angular position of the bullet from the weaver's pos.
                     float angle = toBulletVec.GetAngleWithVector(trueVelocity);
 
-                    // Decide which direction to doge in.
-                    if (angle < 0)
-                        Velocity = trueVelocity.GetNormal() * -1.75f;
-                    else
-                        Velocity = trueVelocity.GetNormal() *  1.75f;
+                    if (Abs(angle) < PI);
+                    { 
+                        // Decide which direction to doge in.
+                        if (angle < 0)
+                            Velocity = trueVelocity.GetNormal() * -1.75f;
+                        else
+                            Velocity = trueVelocity.GetNormal() *  1.75f;
+
+                        // Update the closest bullet data.
+                        closestBulletPos  = bullet.Pos;
+                        closestBulletDist = bulletDist;
+                    }
                 }
             }
 
