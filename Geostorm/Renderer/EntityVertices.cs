@@ -17,6 +17,7 @@ namespace Geostorm.Renderer
         public Vector2[] BulletVertices   = new Vector2[5];
         public Vector2[] GeomVertices     = new Vector2[5];
         public Vector2[] WandererVertices = new Vector2[14];
+        public Vector2[] RocketVertices   = new Vector2[7];
         public Vector2[] GruntVertices    = new Vector2[5];
         public Vector2[] WeaverVertices   = new Vector2[10];
         public Vector2[] ParticleVertices = new Vector2[2];
@@ -89,6 +90,18 @@ namespace Geostorm.Renderer
                 WandererVertices[13]  = new Vector2( 0,  0) * preScale;
             }
 
+            // Load rocket vertices.
+            {
+                float preScale = 18;
+                RocketVertices[0] = new Vector2( 1.0f, 0.0f ) * preScale;
+                RocketVertices[1] = new Vector2(-0.5f,-0.75f) * preScale;
+                RocketVertices[2] = new Vector2(-1.0f,-0.5f ) * preScale;
+                RocketVertices[3] = new Vector2(-0.5f, 0.0f ) * preScale;
+                RocketVertices[4] = new Vector2(-1.0f, 0.5f ) * preScale;
+                RocketVertices[5] = new Vector2(-0.5f, 0.75f) * preScale;
+                RocketVertices[6] = new Vector2( 1.0f, 0.0f ) * preScale;
+            }
+
             // Load grunt vertices.
             {
                 float preScale = 18;
@@ -137,11 +150,14 @@ namespace Geostorm.Renderer
             else if (entityType == typeof(Geom)) {
                 vertices = (Vector2[])GeomVertices.Clone();
             }
-            else if (entityType == typeof(Grunt)) {
-                vertices = (Vector2[])GruntVertices.Clone();
-            }
             else if (entityType == typeof(Wanderer)) {
                 vertices = (Vector2[])WandererVertices.Clone();
+            }
+            else if (entityType == typeof(Rocket)) { 
+                vertices = (Vector2[])RocketVertices.Clone();
+            }
+            else if (entityType == typeof(Grunt)) {
+                vertices = (Vector2[])GruntVertices.Clone();
             }
             else if (entityType == typeof(Weaver)) {
                 vertices = (Vector2[])WeaverVertices.Clone();
@@ -172,35 +188,5 @@ namespace Geostorm.Renderer
 
             return output.ToArray();
         }
-
-        /*
-        public RGBA GetEntityColor<T>(T entity) where T : IEntity
-        {
-            Type entityType = entity.GetType();
-            RGBA color      = PlayerColor;
-
-            // Get the right vertices and color in function of the entity.
-            if (entityType == typeof(Bullet)) {
-                color = BulletColor;
-            }
-            else if (entityType == typeof(Geom)) {
-                color = GeomColor;
-            }
-            else if (entityType == typeof(Wanderer)) {
-                color = WandererColor;
-            }
-            else if (entityType == typeof(Grunt)) {
-                color = GruntColor;
-            }
-            else if (entityType == typeof(Weaver)) {
-                color = WeaverColor;
-            }
-            else if (entity is Particle particle) { 
-                color = particle.Color;
-            }
-
-            return color;
-        }
-        */
     }
 }

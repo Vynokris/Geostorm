@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Collections.Generic;
 
 using Geostorm.Core;
@@ -26,27 +27,19 @@ namespace Geostorm.Utility
 
         public void SpawnRandomEnemy(in GameState gameState, ref List<GameEvent> gameEvents)
         {
-            int totalChance    = 0;
-            int wandererChance = 40;
-            int gruntChance    = 40;
-            int weaverChance   = 20;
+            // Chance percentages for random enemy type.
+            Type[] enemyTypes   = new Type[] { typeof(Wanderer), typeof(Rocket), typeof(Grunt), typeof(Weaver) };
+            int[]  enemyChances = new int[]  { 35,               20,             30,            15             };
+            int    totalChance  = 0;
 
             int randInt = RandomGen.Next() % 100;
-
-            totalChance += wandererChance;
-            if (randInt < totalChance) {
-                SpawnEnemy(ref gameEvents, typeof(Wanderer), gameState.ScreenSize);
-                return;
-            }
-            totalChance += gruntChance;
-            if (randInt < totalChance) {
-                SpawnEnemy(ref gameEvents, typeof(Grunt), gameState.ScreenSize);
-                return;
-            }
-            totalChance += weaverChance;
-            if (randInt < totalChance) {
-                SpawnEnemy(ref gameEvents, typeof(Weaver), gameState.ScreenSize);
-                return;
+            for (int i = 0; i < enemyChances.Length; i++)
+            {
+                totalChance += enemyChances[i];
+                if (randInt < totalChance) { 
+                    SpawnEnemy(ref gameEvents, enemyTypes[i], gameState.ScreenSize);
+                    return;
+                }
             }
         }
 
@@ -58,6 +51,9 @@ namespace Geostorm.Utility
 
             if      (enemyType == typeof(Wanderer)) {
                 gameEvents.Add(new EnemySpawnedEvent(new Wanderer(pos, preSpawnDelay)));
+            }
+            else if (enemyType == typeof(Rocket)) {
+                gameEvents.Add(new EnemySpawnedEvent(new Rocket  (pos, preSpawnDelay)));
             }
             else if (enemyType == typeof(Grunt)) {
                 gameEvents.Add(new EnemySpawnedEvent(new Grunt   (pos, preSpawnDelay)));
