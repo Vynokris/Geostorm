@@ -2,7 +2,10 @@ using Geostorm.Core;
 using Geostorm.Renderer;
 using Geostorm.GameData;
 
+using System.Numerics;
+using static System.MathF;
 using static MyMathLib.Geometry2D;
+using static MyMathLib.Arithmetic;
 
 namespace Geostorm
 {
@@ -22,6 +25,7 @@ namespace Geostorm
             GameState gameState = new(screenW,  screenH);
 
             imguiController.Load(screenW, screenH);
+
 
             // ----- Main game loop ----- //
 

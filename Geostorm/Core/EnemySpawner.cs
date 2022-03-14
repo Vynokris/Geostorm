@@ -25,21 +25,27 @@ namespace Geostorm.Core
 
         public void SpawnRandomEnemy(in GameState gameState, ref List<GameEvent> gameEvents)
         {
-            int randType = RandomGen.Next() % 3;
+            int totalChance    = 0;
+            int wandererChance = 40;
+            int gruntChance    = 40;
+            int weaverChance   = 20;
 
-            switch (randType)
-            { 
-            case 0:
+            int randInt = RandomGen.Next() % 100;
+
+            totalChance += wandererChance;
+            if (randInt < totalChance) {
                 SpawnEnemy(ref gameEvents, typeof(Wanderer), gameState.ScreenSize);
-                break;
-            case 1:
+                return;
+            }
+            totalChance += gruntChance;
+            if (randInt < totalChance) {
                 SpawnEnemy(ref gameEvents, typeof(Grunt), gameState.ScreenSize);
-                break;
-            case 2:
+                return;
+            }
+            totalChance += weaverChance;
+            if (randInt < totalChance) {
                 SpawnEnemy(ref gameEvents, typeof(Weaver), gameState.ScreenSize);
-                break;
-            default:
-                break;
+                return;
             }
         }
 

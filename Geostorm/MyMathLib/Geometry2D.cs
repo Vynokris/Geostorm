@@ -39,6 +39,12 @@ namespace MyMathLib
         // Returns a normalized copy of the vector.
         public static Vector2 GetNormalized(in this Vector2 v)       { return v / v.Length(); }
 
+        // Negates the vector's coordinates.
+        public static void Negate(ref this Vector2 v)                { v = v.GetNegated(); }
+
+        // Returns a negated copy of the vector.
+        public static Vector2 GetNegated(in this Vector2 v)          { return new Vector2(-v.X, -v.Y); }
+
         // Modifies the length of the given vector to correspond to the given value.
         public static void SetLength(ref this Vector2 v, in float length)           { v = v.GetModifiedLength(length); }
         
@@ -75,9 +81,10 @@ namespace MyMathLib
         // Returns the angle (in radians) between two vectors.
         public static float GetAngleWithVector(in this Vector2 v0, in Vector2 v1)
         {
-            float v0angle = v0.GetAngle();
-            float v1angle = v1.GetAngle();
-            return (v0angle >= v1angle ? (v0angle - v1angle) : (v1angle - v0angle));
+            float angle = Acos(v0.Dot(v1) / (v0.Length() * v1.Length()));
+            if(v0.X*v1.Y - v0.Y*v1.X < 0)
+                angle = -angle;
+            return angle;
         }
 
         // Changes the vector's angle while conserving its length.

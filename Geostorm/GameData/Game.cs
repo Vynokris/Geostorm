@@ -34,9 +34,10 @@ namespace Geostorm.GameData
             List<GameEvent> gameEvents = new();
 
             // Update the game state.
-            gameState.PlayerPos  = player.Pos;
             gameState.Score      = Score;
             gameState.Multiplier = Multiplier;
+            gameState.PlayerPos  = player.Pos;
+            gameState.bullets    = bullets;
 
             // Update the entity collisions.
             Collisions.DoCollisions(player, bullets, enemies, entityVertices, ref gameEvents);

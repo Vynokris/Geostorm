@@ -11,12 +11,14 @@ namespace Geostorm.Core
     {
         public float PreSpawnDelay { get; private set; } = 0;
         public readonly Cooldown SpawnDelay = new(1);
+        public float VelocityLength = 3;
 
         public Enemy() { }
-        public Enemy(Vector2 pos, float preSpawnDelay = 0) : base(pos, Vector2Create(3, 0), 0) 
+        public Enemy(Vector2 pos, float preSpawnDelay = 0, float speed = 3) : base(pos, Vector2Create(3, 0), 0) 
         { 
             PreSpawnDelay = preSpawnDelay; 
             SpawnDelay.ChangeDuration(preSpawnDelay); 
+            VelocityLength = speed;
         }
 
         public sealed override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)

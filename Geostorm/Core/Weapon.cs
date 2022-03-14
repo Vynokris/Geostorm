@@ -13,19 +13,21 @@ namespace Geostorm.Core
     {
         public readonly Cooldown ShootCooldown = new(0.10f);
         public int   BulletsPerShot = 2;
-        public float ShootDist      = 21f;
+        public float FwdOffset      = 21f;
         public float SpreadDist     = 15f;
         public float SpreadAngle    = 0f;
+        public float SpreadFwd      = 0f;
 
         public Weapon() { }
 
-        public Weapon(float shootCooldown, int bulletsPerShot, float shootDist, float spreadDist, float spreadAngle)
+        public Weapon(float shootCooldown, int bulletsPerShot, float fwdOffset, float spreadDist, float spreadAngle, float spreadFwd)
         {
             ShootCooldown.ChangeDuration(shootCooldown);
             BulletsPerShot = bulletsPerShot;
-            ShootDist      = shootDist;
+            FwdOffset      = fwdOffset;
             SpreadDist     = spreadDist;
             SpreadAngle    = spreadAngle;
+            SpreadFwd      = spreadFwd;
         }
 
         public void Update(float playerRotation, in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
@@ -38,14 +40,22 @@ namespace Geostorm.Core
                 float totalAngle = SpreadAngle * BulletsPerShot;
                 float firstAngle = totalAngle * -0.5f + SpreadAngle / 2;
 
+                float totalFwd = SpreadFwd * BulletsPerShot;
+                float firstFwd = totalFwd * -0.5f + SpreadFwd / 2;
+
                 for (int i = 0; i < BulletsPerShot; i++)
                 {
                     float curDist  = firstDist  + SpreadDist  * i;
                     float curAngle = firstAngle + SpreadAngle * i;
+                    float curFwd;
+                    if (i < BulletsPerShot / 2)
+                        curFwd = firstFwd + SpreadFwd * i;
+                    else
+                        curFwd = firstFwd + SpreadFwd * (BulletsPerShot - i - 1);
 
                     Vector2 curPos = gameState.PlayerPos;
                     
-                    curPos += Vector2FromAngle(playerRotation, ShootDist);
+                    curPos += Vector2FromAngle(playerRotation, FwdOffset + curFwd);
                     curPos.RotateAsPoint(curAngle, gameState.PlayerPos);
                     curPos += Vector2FromAngle(playerRotation, 1).GetNormal() * curDist;
 
@@ -61,20 +71,62 @@ namespace Geostorm.Core
 
         public void LoadDefault()
         {
-            ShootCooldown.ChangeDuration(0.10f);
+            ShootCooldown.ChangeDuration(0.1f);
             BulletsPerShot = 2;
-            ShootDist      = 21f;
+            FwdOffset      = 21f;
             SpreadDist     = 15f;
             SpreadAngle    = 0f;
+            SpreadFwd      = 0f;
+        }
+
+        public void LoadShotgun()
+        {
+            ShootCooldown.ChangeDuration(0.4f);
+            BulletsPerShot = 6;
+            FwdOffset      = 21f;
+            SpreadDist     = 0f;
+            SpreadAngle    = PI / 48;
+            SpreadFwd      = 0f;
+        }
+
+        public void LoadBow()
+        {
+            ShootCooldown.ChangeDuration(0.3f);
+            BulletsPerShot = 9;
+            FwdOffset      = 80f;
+            SpreadDist     = 20f;
+            SpreadAngle    = 0f;
+            SpreadFwd      = 25f;
+        }
+
+        public void LoadGrenade()
+        {
+            ShootCooldown.ChangeDuration(0.5f);
+            BulletsPerShot = 20;
+            FwdOffset      = 21f;
+            SpreadDist     = 0f;
+            SpreadAngle    = PI / 10;
+            SpreadFwd      = 0f;
+        }
+
+        public void LoadNeutronStar()
+        {
+            ShootCooldown.ChangeDuration(0.01f);
+            BulletsPerShot = 8;
+            FwdOffset      = 21f;
+            SpreadDist     = 0f;
+            SpreadAngle    = PI / 4;
+            SpreadFwd      = 0f;
         }
 
         public void LoadDestroyerOfWorlds()
         {
             ShootCooldown.ChangeDuration(0.01f);
             BulletsPerShot = 40;
-            ShootDist      = 21f;
+            FwdOffset      = 21f;
             SpreadDist     = 0f;
             SpreadAngle    = PI / 20;
+            SpreadFwd      = 0f;
         }
     }
 }
