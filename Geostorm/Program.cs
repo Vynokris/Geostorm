@@ -1,11 +1,6 @@
-using Geostorm.Core;
 using Geostorm.Renderer;
 using Geostorm.GameData;
-
-using System.Numerics;
-using static System.MathF;
-using static MyMathLib.Geometry2D;
-using static MyMathLib.Arithmetic;
+using Geostorm.Utility;
 
 namespace Geostorm
 {
@@ -17,6 +12,7 @@ namespace Geostorm
 
             GraphicsController graphicsController = new();
             ImguiController    imguiController    = new();
+            CheatMenu          cheatMenu          = new();
 
             int screenW = graphicsController.ScreenWidth;
             int screenH = graphicsController.ScreenHeight;
@@ -37,9 +33,17 @@ namespace Geostorm
                 GameInputs gameInputs = graphicsController.GetInputs();
                 graphicsController.UpdateGameState(ref gameState);
 
-                // Update imgui and the game.
+                // Update imgui.
                 imguiController.Update(gameState.DeltaTime);
-                game.Update(ref gameState, gameInputs);
+
+                // Update the cheat menu.
+                cheatMenu.UpdateAndDraw(ref game, gameState, gameInputs);
+                if (gameInputs.CheatMenu)
+                    graphicsController.mouseCursorHidden = !cheatMenu.Shown;
+
+                // Update the game if the cheat menu isn't open.
+                if (!cheatMenu.Shown)
+                    game.Update(ref gameState, gameInputs);
 
 
                 // ----- Draw ----- //

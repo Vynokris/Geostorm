@@ -9,5 +9,6 @@ namespace Geostorm.GameData
         public bool    Shoot;       // Left click / right 2nd trigger.
         public Vector2 ShootDir;    // Direction given by joystick.
         public Vector2 ShootTarget; // Mouse position.
+        public bool    CheatMenu;   // Alt+C / Select+Start.
     }
 }

@@ -20,7 +20,7 @@ namespace MyMathLib
         public static float SqPow(float val)    { return val * val;  }
 
         // Returns 1 if the given value is positive or null, and -1 if it is negative.
-        public static int SignOf(float val)     { if (val == 0) return 1; return (int)val / Abs((int)val); }
+        public static int SignOf(float val)     { if ((int)val == 0) return 1; return (int)val / Abs((int)val); }
 
         // Converts the given angle from degrees to radians.
         public static float DegToRad(float val)  { return val * ((float)PI / 180f); }
