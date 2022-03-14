@@ -109,6 +109,26 @@ namespace Geostorm.Core
             SpreadFwd      = 0f;
         }
 
+        public void LoadSpearOfJustice()
+        {
+            ShootCooldown.ChangeDuration(0.4f);
+            BulletsPerShot = 15;
+            FwdOffset      = 170f;
+            SpreadDist     = 12.5f;
+            SpreadAngle    = 0f;
+            SpreadFwd      = 50f;
+        }
+
+        public void LoadGoldenFalcon()
+        {
+            ShootCooldown.ChangeDuration(0.3f);
+            BulletsPerShot = 12;
+            FwdOffset      = 21f;
+            SpreadDist     = 18f;
+            SpreadAngle    = -0.052f;
+            SpreadFwd      = 15f;
+        }
+
         public void LoadNeutronStar()
         {
             ShootCooldown.ChangeDuration(0.01f);

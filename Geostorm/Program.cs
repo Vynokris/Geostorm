@@ -12,6 +12,7 @@ namespace Geostorm
 
             GraphicsController graphicsController = new();
             ImguiController    imguiController    = new();
+            DebugMenu          debugMenu          = new();
             CheatMenu          cheatMenu          = new();
 
             int screenW = graphicsController.ScreenWidth;
@@ -36,6 +37,9 @@ namespace Geostorm
                 // Update imgui.
                 imguiController.Update(gameState.DeltaTime);
 
+                // Update the debug menu.
+                debugMenu.UpdateAndDraw(game, gameState, gameInputs);
+
                 // Update the cheat menu.
                 cheatMenu.UpdateAndDraw(ref game, gameState, gameInputs);
                 if (gameInputs.CheatMenu)
@@ -51,6 +55,7 @@ namespace Geostorm
                 graphicsController.BeginDrawing();
                 { 
                     game.Draw(graphicsController);
+                    graphicsController.DrawUi(game, gameState);
                     imguiController.Draw();
                 }
                 graphicsController.EndDrawing();

@@ -110,6 +110,9 @@ namespace Geostorm.Renderer
             // Get the delta time.
             gameState.DeltaTime = Raylib.GetFrameTime();
 
+            // Get the fps.
+            gameState.FPS = Raylib.GetFPS();
+
             // Update the game duration.
             gameState.GameDuration += gameState.DeltaTime;
         }
@@ -152,6 +155,13 @@ namespace Geostorm.Renderer
                 {
                     inputs.CheatMenu = true;
                 }
+
+                // Get the debug toggle input.
+                if (Raylib.IsKeyDown   (KeyboardKey.KEY_LEFT_ALT) &&
+                    Raylib.IsKeyPressed(KeyboardKey.KEY_D))
+                {
+                    inputs.DebugMenu = true;
+                }
             }
             else
             { 
@@ -174,11 +184,12 @@ namespace Geostorm.Renderer
                 inputs.ShootDir.Normalize();
 
                 // Get the cheat toggle input.
-                if (Raylib.IsGamepadButtonDown   (0, GamepadButton.GAMEPAD_BUTTON_MIDDLE_LEFT) &&
-                    Raylib.IsGamepadButtonPressed(0, GamepadButton.GAMEPAD_BUTTON_MIDDLE_RIGHT))
-                {
+                if (Raylib.IsGamepadButtonPressed(0, GamepadButton.GAMEPAD_BUTTON_MIDDLE_RIGHT))
                     inputs.CheatMenu = true;
-                }
+
+                // Get the debug toggle input.
+                if (Raylib.IsGamepadButtonPressed(0, GamepadButton.GAMEPAD_BUTTON_MIDDLE_LEFT))
+                    inputs.DebugMenu = true;
             }
 
             return inputs;
@@ -347,6 +358,40 @@ namespace Geostorm.Renderer
                                       entityVertices.CursorVertices[i+1] + Raylib.GetMousePosition(), 
                                       1, Color.WHITE);
                 }
+            }
+        }
+
+        public void DrawUi(in Game game, in GameState gameState)
+        {
+            int TitleSize          = 45;
+            int ScreenBoundOffsetX = 40;
+            int ScreenBoundOffsetY = 30;
+
+            switch (game.currentScene)
+            {
+                case Scenes.MainMenu:
+                    break;
+
+                case Scenes.InGame:
+                    // Draw score.
+                    Raylib.DrawText($"SCORE: {gameState.Score}", ScreenBoundOffsetX, ScreenBoundOffsetY, TitleSize, new Color(255, 255, 255, 255));
+
+                    // Draw multiplier.
+                    int multiplierPosX = (int)gameState.ScreenSize.X - ScreenBoundOffsetX - Raylib.MeasureText($"x{gameState.Multiplier}", TitleSize);
+                    Raylib.DrawText($"x{gameState.Multiplier}", multiplierPosX, ScreenBoundOffsetY, TitleSize, new Color(255, 255, 255, 255));
+
+                    // Draw multiplier reset bar.
+                    Raylib.DrawRectangleLines((int)gameState.ScreenSize.X - ScreenBoundOffsetX - 100, 
+                                              ScreenBoundOffsetY + TitleSize + 20, 
+                                              120, 20, Color.WHITE);
+                    Raylib.DrawRectangle      ((int)gameState.ScreenSize.X - ScreenBoundOffsetX - 100, 
+                                              ScreenBoundOffsetY + TitleSize + 20, 
+                                              (int)(120 * game.MultiplierResetCooldown.CompletionRatio()), 20, Color.WHITE);
+
+                    break;
+
+                case Scenes.GameOver:
+                    break;
             }
         }
     }

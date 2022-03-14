@@ -8,10 +8,20 @@ using Geostorm.Utility;
 
 namespace Geostorm.GameData
 {
+    public enum Scenes
+    {
+        MainMenu = 0,
+        InGame   = 1,
+        GameOver = 2,
+    }
+
     public class Game : IEventListener
     {
         public int Score      { get; private set; } = 0;
         public int Multiplier { get; private set; } = 1;
+        public Cooldown MultiplierResetCooldown = new(100);
+
+        public List<GameEvent> GameEvents = new();
 
         public int StarCount = 100;
         public List<Star>     stars     = new();
@@ -24,6 +34,8 @@ namespace Geostorm.GameData
 
         public EnemySpawner    enemySpawner    = new();
         public ParticleSpawner particleSpawner = new();
+
+        public Scenes currentScene = Scenes.InGame;
 
 
         public readonly EntityVertices entityVertices = new();
@@ -38,8 +50,11 @@ namespace Geostorm.GameData
 
         public void Update(ref GameState gameState, in GameInputs gameInputs)
         {
-            // Reset the gameEvents to be give it to all entitites.
-            List<GameEvent> gameEvents = new();
+            // Update the multiplier reset cooldown.
+            if (MultiplierResetCooldown.Update(gameState.DeltaTime)) {
+                Multiplier = 1;
+                MultiplierResetCooldown.ChangeDuration(100);
+            }
 
             // Update the game state.
             gameState.Score      = Score;
@@ -48,38 +63,41 @@ namespace Geostorm.GameData
             gameState.bullets    = bullets;
 
             // Update the entity collisions.
-            Collisions.DoCollisions(player, bullets, enemies, entityVertices, ref gameEvents);
+            Collisions.DoCollisions(player, bullets, enemies, entityVertices, ref GameEvents);
 
             // Update the stars.
             foreach (Star star in stars)
-                star.Update(gameState, gameInputs, ref gameEvents);
+                star.Update(gameState, gameInputs, ref GameEvents);
 
             // Update the particles.
             foreach (Particle particle in particles)
-                particle.Update(gameState, gameInputs, ref gameEvents);
+                particle.Update(gameState, gameInputs, ref GameEvents);
 
             // Update the player.
-            player.Update(gameState, gameInputs, ref gameEvents);
+            player.Update(gameState, gameInputs, ref GameEvents);
 
             // Update the bullets.
             foreach (Bullet bullet in bullets) 
-                bullet.Update(gameState, gameInputs, ref gameEvents);
+                bullet.Update(gameState, gameInputs, ref GameEvents);
 
             // Update the geoms.
             foreach (Geom geom in geoms)
-                geom.Update(gameState, gameInputs, ref gameEvents);
+                geom.Update(gameState, gameInputs, ref GameEvents);
 
             // Update the enemies.
             foreach (Enemy enemy in enemies)
-                enemy.Update(gameState, gameInputs, ref gameEvents);
+                enemy.Update(gameState, gameInputs, ref GameEvents);
 
             // Update the entity spawners.
-            enemySpawner.Update(gameState, ref gameEvents);
-            particleSpawner.Update(ref gameEvents);
+            enemySpawner.Update(gameState, ref GameEvents);
+            particleSpawner.Update(ref GameEvents);
 
             // Handle game events.
-            HandleEvents(gameEvents);
-            player.HandleEvents(gameEvents);
+            HandleEvents(GameEvents);
+            player.HandleEvents(GameEvents);
+
+            // Reset the gameEvents to be give it to all entitites.
+            GameEvents.Clear();
         }
 
         public void HandleEvents(in List<GameEvent> gameEvents)
@@ -88,6 +106,10 @@ namespace Geostorm.GameData
             {
                 switch (gameEvent)
                 {
+                    case PlayerDamagedEvent damageEvent:
+                        Multiplier = 1;
+                        break;
+
                     case PlayerKilledEvent killedEvent:
                         // TODO: GAME OVER.
                         break;
@@ -107,6 +129,7 @@ namespace Geostorm.GameData
                     case GeomPickedUpEvent pickupEvent:
                         geoms.Remove(pickupEvent.geom);
                         Multiplier++;
+                        MultiplierResetCooldown.ChangeDuration(100f / Multiplier);
                         break;
 
                     case EnemySpawnedEvent spawnEvent:
@@ -115,7 +138,7 @@ namespace Geostorm.GameData
 
                     case EnemyKilledEvent killEvent:
                         enemies.Remove(killEvent.enemy);
-                        Score++;
+                        Score += Multiplier;
 
                         System.Random rng = new();
                         for (int i = 0; i < rng.Next(1, 2); i++) {
@@ -124,7 +147,8 @@ namespace Geostorm.GameData
                         break;
 
                     case ParticleSpawnedEvent particleSpawnEvent:
-                        particles.Add(particleSpawnEvent.particle);
+                        for (int i = 0; i < particleSpawnEvent.Count; i++)
+                            particles.Add(new Particle(particleSpawnEvent.Pos, particleSpawnEvent.Color));
                         break;
 
                     case ParticleDespawnEvent particleDespawnEvent:
