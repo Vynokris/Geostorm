@@ -100,7 +100,7 @@ namespace Geostorm.Utility
                 if (CollapsingHeader("Enemy spawner"))
                 {
                     // Time between 2 enemy spawning waves.
-                    if (DragFloat("Time between enemy waves", ref game.enemySpawner.TimeBetweenWaves, 0.01f, -10f))
+                    if (DragFloat("Time between enemy waves", ref game.enemySpawner.TimeBetweenWaves, 0.01f))
                         game.enemySpawner.TimeBetweenWaves = ClampAbove(game.enemySpawner.TimeBetweenWaves, -10f);
 
                     // Killing all enemies.

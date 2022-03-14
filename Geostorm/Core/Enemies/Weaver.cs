@@ -35,12 +35,13 @@ namespace Geostorm.Core
                 && closestBulletPos.GetDistanceFromPoint(bullet.Pos) > 20)
                 {
                     // Get the angular position of the bullet from the weaver's pos.
-                    float angle = toBulletVec.GetAngleWithVector(trueVelocity);
+                    float toBulletAngle       = toBulletVec.GetAngleWithVector(trueVelocity);
+                    float bullletArrivalAngle = toBulletVec.GetAngleWithVector(bullet.Velocity * -1);
 
-                    if (Abs(angle) < PI);
+                    if (Abs(bullletArrivalAngle) < 3 * PI / 4)
                     { 
                         // Decide which direction to doge in.
-                        if (angle < 0)
+                        if (toBulletAngle < 0)
                             Velocity = trueVelocity.GetNormal() * -1.75f;
                         else
                             Velocity = trueVelocity.GetNormal() *  1.75f;

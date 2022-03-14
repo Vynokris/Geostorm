@@ -17,7 +17,7 @@ namespace Geostorm.Core
         public Vector2 Velocity { get; set; } = Vector2Zero();
         public Vector2 Scale    { get; set; } = Vector2Create(1, 1);
         public float   Rotation { get; set; } = 0;
-        public RGBA    Color    { get; set; } = new(1f, 0.83f, 0.54f, 1f);
+        public RGBA    Color    { get; set; } = new(1f, 0.65f, 0.2f, 1f);
 
         public readonly float SegmentLength   = 18*2;
         public Segment2       DirectorSegment = new();
@@ -50,7 +50,7 @@ namespace Geostorm.Core
         public List<SnakeBodyPart> BodyParts = new();
 
         public Snake() { }
-        public Snake(Vector2 pos, float preSpawnDelay = 0, int minLen = 0, int maxLen = 0) : base(pos, new RGBA(0.51f, 0.47f, 0.9f, 1f), preSpawnDelay) 
+        public Snake(Vector2 pos, float preSpawnDelay = 0, int minLen = 0, int maxLen = 0) : base(pos, new RGBA(1f, 0.1f, 0.1f, 1f), preSpawnDelay) 
         {
             System.Random rng = new();
             Rotation = DegToRad(rng.Next(0, 360));
