@@ -13,7 +13,7 @@ namespace Geostorm.Core
     public class Player : Entity, IEventListener
     {
         public           int      Health        = 3;
-        private readonly Weapon   Weapon        = new();
+        public  readonly Weapon   Weapon        = new();
         private readonly Cooldown DashCooldown  = new(0.30f);
         private readonly Cooldown DashingFrames = new(0.25f);
         public  readonly Cooldown Invincibility = new(3);

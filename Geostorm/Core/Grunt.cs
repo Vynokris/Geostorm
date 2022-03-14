@@ -15,7 +15,7 @@ namespace Geostorm.Core
         public override void DoUpdate(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Make the grunt move towards the player.
-            Velocity = Velocity.GetModifiedAngle(Vector2FromPoints(Pos, gameState.PlayerPos).GetAngle());
+            Velocity = Vector2FromPoints(Pos, gameState.PlayerPos).GetModifiedLength(VelocityLength);
 
             // Move the grunt according to its velocity.
             Pos += Velocity;

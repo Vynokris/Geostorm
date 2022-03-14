@@ -1,5 +1,6 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
+using System.Collections.Generic;
+using Geostorm.Core;
 
 namespace Geostorm.GameData
 {
@@ -11,6 +12,7 @@ namespace Geostorm.GameData
         public int     Score        = 0;
         public int     Multiplier   = 1;
         public Vector2 PlayerPos;
+        public List<Bullet> bullets; // This is used by weaver enemies to dodge.
 
         public GameState(int screenW, int screenH) { ScreenSize = new(screenW, screenH); }
     }
