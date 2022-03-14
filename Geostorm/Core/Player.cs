@@ -122,7 +122,7 @@ namespace Geostorm.Core
 
                 if (Event is BounceOnSnakeBodyEvent bounceEvent) { 
                     Vector2 surfaceNormal = Vector2FromSegment(bounceEvent.snakeBodyPart.DirectorSegment).GetNormalized().GetNormal();
-                    Velocity = surfaceNormal * Velocity.Length() * -SignOf(Velocity.Dot(surfaceNormal));
+                    Velocity = surfaceNormal * ClampAbove(Velocity.Length(), 5) * -SignOf(Velocity.Dot(surfaceNormal));
                 }
             }
         }

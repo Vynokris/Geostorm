@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Collections.Generic;
+using static MyMathLib.Colors;
 using Geostorm.Core;
 
 namespace Geostorm.GameData
@@ -88,9 +89,11 @@ namespace Geostorm.GameData
 
     public class ParticleSpawnedEvent : GameEvent
     {
-        public Particle particle;
+        public int     Count;
+        public Vector2 Pos;
+        public RGBA    Color;
 
-        public ParticleSpawnedEvent(in Particle spawnedParticle) { particle = spawnedParticle; }
+        public ParticleSpawnedEvent(in int count, Vector2 pos, RGBA color) { Count = count; Pos = pos; Color = color; }
     }
 
     public class ParticleDespawnEvent : GameEvent

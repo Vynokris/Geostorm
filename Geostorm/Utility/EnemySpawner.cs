@@ -10,10 +10,10 @@ namespace Geostorm.Utility
     public class EnemySpawner
     {
         private Type[] EnemyTypes   = new Type[] { typeof(Wanderer), typeof(Rocket), typeof(Grunt), typeof(Weaver), typeof(Snake) };
-        public  int[]  EnemyChances = new int[]  { 30,               20,             25,            15,             10 };
+        public  int [] EnemyChances = new int[]  { 30,               20,             25,            15,             10 };
 
         public float TimeBetweenWaves = 1f;
-        public int   SnakeMinLen      = 10;
+        public int   SnakeMinLen      = 5;
         public int   SnakeMaxLen      = 15;
 
         private Random   RandomGen     = new();
