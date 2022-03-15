@@ -27,8 +27,10 @@ namespace Geostorm.Core
         {
             // Update the player's cooldowns.
             DashCooldown .Update(gameState.DeltaTime);
-            DashDuration.Update(gameState.DeltaTime);
+            DashDuration .Update(gameState.DeltaTime);
             Invincibility.Update(gameState.DeltaTime);
+            if (Invincibility.LastFrame(gameState.DeltaTime))
+                gameEvents.Add(new PlayerInvincibilityEndEvent());
 
             // -- Accelerate -- //
             if (gameInputs.Movement != Vector2Zero())
@@ -40,7 +42,7 @@ namespace Geostorm.Core
                 float dirAngle = gameInputs.Movement.GetAngle();
 
                 // Initiate a dash by going at dashing velocity in the moving dir.
-                if (DashDuration.CompletionRatio() >= 0.9f)
+                if (DashDuration.CompletionRatio() > 0.9f)
                     Velocity = Velocity.GetModifiedLength(DashVelocity);
 
                 // If the player is under the maximum velocity, make him accelerate.

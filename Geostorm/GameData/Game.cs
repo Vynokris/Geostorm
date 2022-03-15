@@ -25,8 +25,7 @@ namespace Geostorm.GameData
 
         public int StarCount = 100;
         public List<Star>     stars       = new();
-        public List<Particle> particles   = new(); 
-        public WarpingGrid    warpingGrid;
+        public List<Particle> particles   = new();
 
         public Player       player;
         public List<Bullet> bullets = new();
@@ -36,8 +35,9 @@ namespace Geostorm.GameData
         public EnemySpawner    enemySpawner    = new();
         public ParticleSpawner particleSpawner = new();
 
-        public Ui ui = new();
         public Scenes currentScene = Scenes.MainMenu;
+        public Ui ui = new();
+        public SoundController soundController = new();
 
 
         public readonly EntityVertices entityVertices = new();
@@ -53,6 +53,9 @@ namespace Geostorm.GameData
 
         public void Update(ref GameState gameState, in GameInputs gameInputs)
         {
+            // Update the ambiance music.
+            soundController.UpdateAmbiance();
+
             // Update the game state.
             gameState.Score      = Score;
             gameState.Multiplier = Multiplier;
@@ -192,9 +195,10 @@ namespace Geostorm.GameData
                 }    
             }
 
-            // Handle events for the player and ui.
+            // Handle events for the player, ui and sound controller.
             player.HandleEvents(GameEvents);
             ui.HandleEvents(GameEvents);
+            soundController.HandleEvents(GameEvents);
         }
 
         public void Draw(in GraphicsController graphicsController)

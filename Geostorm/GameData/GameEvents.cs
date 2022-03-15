@@ -30,6 +30,10 @@ namespace Geostorm.GameData
     {
     }
 
+    public class PlayerInvincibilityEndEvent : GameEvent
+    {
+    }
+
     public class PlayerDamagedEvent : GameEvent
     {
     }
@@ -101,5 +105,9 @@ namespace Geostorm.GameData
         public Particle particle;
 
         public ParticleDespawnEvent(in Particle despawnedParticle) { particle = despawnedParticle; }
+    }
+
+    public class UiFlickerEvent : GameEvent
+    {
     }
 }
