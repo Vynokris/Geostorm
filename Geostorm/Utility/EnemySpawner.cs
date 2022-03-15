@@ -2,6 +2,8 @@
 using System.Numerics;
 using System.Collections.Generic;
 
+using static MyMathLib.Arithmetic;
+
 using Geostorm.Core;
 using Geostorm.GameData;
 
@@ -12,11 +14,12 @@ namespace Geostorm.Utility
         private Type[] EnemyTypes   = new Type[] { typeof(Wanderer), typeof(Rocket), typeof(Grunt), typeof(Weaver), typeof(Snake) };
         public  int [] EnemyChances = new int[]  { 30,               20,             25,            15,             10 };
 
-        public float TimeBetweenWaves = 1f;
-        public int   SnakeMinLen      = 5;
-        public int   SnakeMaxLen      = 15;
+        public bool  AdaptativeSpawnSpeed = true;
+        public float TimeBetweenWaves     = 1f;
+        public int   SnakeMinLen          = 5;
+        public int   SnakeMaxLen          = 15;
 
-        private Random   RandomGen     = new();
+        private Random   Rng           = new();
         private Cooldown SpawnCooldown = new(0);
 
         public EnemySpawner() { }
@@ -25,9 +28,15 @@ namespace Geostorm.Utility
         {
             if (SpawnCooldown.Update(gameState.DeltaTime))
             {
-                // TODO: change cooldown according to game duration.
-                SpawnCooldown.ChangeDuration(RandomGen.Next() % 2 + TimeBetweenWaves);
-                for (int i = 0; i < RandomGen.Next(1, 3); i++)
+                // Change the time between waves.
+                if (AdaptativeSpawnSpeed)
+                { 
+                    TimeBetweenWaves = Remap(ClampUnder(gameState.GameDuration, 60), 0, 60, 1, -0.5f);
+                }
+
+                // Spawn a wave of enemies.
+                SpawnCooldown.ChangeDuration(ClampAbove(Rng.Next() % 2 + TimeBetweenWaves, 0));
+                for (int i = 0; i < Rng.Next(1, 3); i++)
                     SpawnRandomEnemy(gameState, ref gameEvents);
             }
         }
@@ -37,7 +46,7 @@ namespace Geostorm.Utility
             // Chance percentages for random enemy type.
             int    totalChance  = 0;
 
-            int randInt = RandomGen.Next() % 100;
+            int randInt = Rng.Next() % 100;
             for (int i = 0; i < EnemyChances.Length; i++)
             {
                 totalChance += EnemyChances[i];
@@ -50,9 +59,9 @@ namespace Geostorm.Utility
 
         public void SpawnEnemy(ref List<GameEvent> gameEvents, System.Type enemyType, Vector2 screenSize)
         {
-            Vector2 pos = new(RandomGen.Next() % screenSize.X, 
-                              RandomGen.Next() % screenSize.Y);
-            float preSpawnDelay = RandomGen.Next(0, 120) / 60f;
+            Vector2 pos = new(Rng.Next() % screenSize.X, 
+                              Rng.Next() % screenSize.Y);
+            float preSpawnDelay = Rng.Next(0, 120) / 60f;
 
             if      (enemyType == typeof(Wanderer)) {
                 gameEvents.Add(new EnemySpawnedEvent(new Wanderer(pos, preSpawnDelay)));

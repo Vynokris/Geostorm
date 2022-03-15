@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Numerics;
+using System.Collections.Generic;
 
 using Raylib_cs;
+using static System.MathF;
 using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
 using static MyMathLib.Colors;
 
 using Geostorm.Core;
 using Geostorm.GameData;
+using Geostorm.Utility;
 
 // NOTE: if the bloom shader doesn't work, set Project > Properties > Debug > Working Directory to $(ProjectDir).
 
@@ -20,12 +23,17 @@ namespace Geostorm.Renderer
 
         public bool mouseCursorHidden = true;
 
+        // Screen shake.
+        private Vector2 ShakeOffset = new(0, 0);
+
+        // Shaders.
         private Shader GaussianBlurShader;
         private Shader NonBlackMaskShader;
         private Shader ChromaticAberrationShader;
         private readonly int BlurDirLocation;
         public  readonly int BloomIntensity = 5;
 
+        // Render textures.
         private RenderTexture2D   RenderTexture;
         private RenderTexture2D[] BlurTextures;
 
@@ -94,7 +102,9 @@ namespace Geostorm.Renderer
 
         public bool WindowShouldClose() { return Raylib.WindowShouldClose(); }
 
-        public static Color RGBAtoRayCol(RGBA rgba) 
+        public void SetShakeOffset(in Vector2 shakeOffset) { ShakeOffset = shakeOffset; }
+
+        private static Color RGBAtoRayCol(RGBA rgba) 
         {
             return new Color((int)Clamp(rgba.R*255f, 0, 255), 
                              (int)Clamp(rgba.G*255f, 0, 255), 
@@ -112,13 +122,10 @@ namespace Geostorm.Renderer
 
             // Get the fps.
             gameState.FPS = Raylib.GetFPS();
-
-            // Update the game duration.
-            gameState.GameDuration += gameState.DeltaTime;
         }
 
 
-        // ---------- Keyboard input ---------- //
+        // ---------- Keyboard / Gamepad input ---------- //
 
         public GameInputs GetInputs()
         {
@@ -259,7 +266,7 @@ namespace Geostorm.Renderer
                     // Draw the blurred texture.
                     Raylib.DrawTextureRec(BlurTextures[0].texture,
                                           new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
-                                          new Vector2  (0, 0),
+                                          ShakeOffset,
                                           Color.WHITE);
                     
                     // Draw the non-black pixels of the original texture.
@@ -267,7 +274,7 @@ namespace Geostorm.Renderer
                     { 
                         Raylib.DrawTextureRec(RenderTexture.texture,
                                               new Rectangle(0, 0, ScreenWidth, -ScreenHeight),
-                                              new Vector2  (0, 0),
+                                              ShakeOffset,
                                               Color.WHITE);
                     }
                     Raylib.EndShaderMode();
@@ -358,40 +365,6 @@ namespace Geostorm.Renderer
                                       entityVertices.CursorVertices[i+1] + Raylib.GetMousePosition(), 
                                       1, Color.WHITE);
                 }
-            }
-        }
-
-        public void DrawUi(in Game game, in GameState gameState)
-        {
-            int TitleSize          = 45;
-            int ScreenBoundOffsetX = 40;
-            int ScreenBoundOffsetY = 30;
-
-            switch (game.currentScene)
-            {
-                case Scenes.MainMenu:
-                    break;
-
-                case Scenes.InGame:
-                    // Draw score.
-                    Raylib.DrawText($"SCORE: {gameState.Score}", ScreenBoundOffsetX, ScreenBoundOffsetY, TitleSize, new Color(255, 255, 255, 255));
-
-                    // Draw multiplier.
-                    int multiplierPosX = (int)gameState.ScreenSize.X - ScreenBoundOffsetX - Raylib.MeasureText($"x{gameState.Multiplier}", TitleSize);
-                    Raylib.DrawText($"x{gameState.Multiplier}", multiplierPosX, ScreenBoundOffsetY, TitleSize, new Color(255, 255, 255, 255));
-
-                    // Draw multiplier reset bar.
-                    Raylib.DrawRectangleLines((int)gameState.ScreenSize.X - ScreenBoundOffsetX - 100, 
-                                              ScreenBoundOffsetY + TitleSize + 20, 
-                                              120, 20, Color.WHITE);
-                    Raylib.DrawRectangle      ((int)gameState.ScreenSize.X - ScreenBoundOffsetX - 100, 
-                                              ScreenBoundOffsetY + TitleSize + 20, 
-                                              (int)(120 * game.MultiplierResetCooldown.CompletionRatio()), 20, Color.WHITE);
-
-                    break;
-
-                case Scenes.GameOver:
-                    break;
             }
         }
     }

@@ -12,11 +12,12 @@ namespace Geostorm
 
             GraphicsController graphicsController = new();
             ImguiController    imguiController    = new();
-            DebugMenu          debugMenu          = new();
-            CheatMenu          cheatMenu          = new();
 
             int screenW = graphicsController.ScreenWidth;
             int screenH = graphicsController.ScreenHeight;
+
+            DebugMenu debugMenu = new(screenW, screenH);
+            CheatMenu cheatMenu = new(screenW, screenH);
 
             Game      game      = new(screenW, screenH);
             GameState gameState = new(screenW,  screenH);
@@ -37,10 +38,8 @@ namespace Geostorm
                 // Update imgui.
                 imguiController.Update(gameState.DeltaTime);
 
-                // Update the debug menu.
-                debugMenu.UpdateAndDraw(game, gameState, gameInputs);
-
-                // Update the cheat menu.
+                // Update the debug and cheat menus.
+                debugMenu.UpdateAndDraw(    game, gameState, gameInputs);
                 cheatMenu.UpdateAndDraw(ref game, gameState, gameInputs);
                 if (gameInputs.CheatMenu)
                     graphicsController.mouseCursorHidden = !cheatMenu.Shown;
@@ -55,10 +54,16 @@ namespace Geostorm
                 graphicsController.BeginDrawing();
                 { 
                     game.Draw(graphicsController);
-                    graphicsController.DrawUi(game, gameState);
+                    game.ui.Draw(game, gameState, ref game.GameEvents);
                     imguiController.Draw();
                 }
                 graphicsController.EndDrawing();
+
+
+                // ----- Game events ----- //
+
+                game.HandleEvents(game.GameEvents);
+                game.GameEvents.Clear();
             }
 
 

@@ -9,7 +9,7 @@ namespace Geostorm.GameData
         public Vector2 ScreenSize;
         public int     FPS;
         public float   DeltaTime;
-        public double  GameDuration = 0;
+        public float   GameDuration = 0;
         public int     Score        = 0;
         public int     Multiplier   = 1;
         public Vector2 PlayerPos;

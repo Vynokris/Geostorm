@@ -42,7 +42,10 @@ namespace Geostorm.Core
         public override void Update(in GameState gameState, in GameInputs gameInputs, ref List<GameEvent> gameEvents)
         {
             // Slow down and move according to velocity.
-            Velocity *= 0.95f;
+            if (Velocity.LengthSquared() > 0.001f * 0.001f)
+                Velocity *= 0.95f;
+            else
+                Velocity = Vector2Zero();
             Pos += Velocity;
 
             // Update the despawn timer.
