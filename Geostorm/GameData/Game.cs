@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
 
 using static MyMathLib.Geometry2D;
 
@@ -23,6 +25,13 @@ namespace Geostorm.GameData
 
         public List<GameEvent> GameEvents = new();
 
+        public Ui ui = new();
+        public Scenes currentScene = Scenes.MainMenu;
+
+        public SoundController soundController = new();
+
+        public readonly EntityVertices entityVertices = new();
+
         public int StarCount = 100;
         public List<Star>     stars       = new();
         public List<Particle> particles   = new();
@@ -35,12 +44,6 @@ namespace Geostorm.GameData
         public EnemySpawner    enemySpawner    = new();
         public ParticleSpawner particleSpawner = new();
 
-        public Scenes currentScene = Scenes.MainMenu;
-        public Ui ui = new();
-        public SoundController soundController = new();
-
-
-        public readonly EntityVertices entityVertices = new();
 
         public Game(in int screenW, in int screenH)
         {
@@ -49,6 +52,13 @@ namespace Geostorm.GameData
 
             for (int i = 0; i < StarCount; i++)
                 stars.Add(new Star(screenW, screenH));
+        }
+
+        private void SaveScore()
+        {
+            int highscore = BitConverter.ToInt32(File.ReadAllBytes("highscore.bin"));
+            if (Score > highscore)
+                File.WriteAllBytes("highscore.bin", BitConverter.GetBytes(Score));
         }
 
         public void Update(ref GameState gameState, in GameInputs gameInputs)
@@ -146,6 +156,7 @@ namespace Geostorm.GameData
 
                     case PlayerKilledEvent killedEvent:
                         currentScene = Scenes.GameOver;
+                        SaveScore();
                         break;
 
                     case BulletShotEvent shootEvent:

@@ -205,7 +205,7 @@ namespace Geostorm.Renderer
             Random rng = new();
 
             // Draw title.
-            Vector2 titlePos = new(gameState.ScreenSize.X / 2 - Raylib.MeasureText("Game Over", titleSize) / 2 + menuOffset.X, gameState.ScreenSize.Y / 3f + menuOffset.Y);
+            Vector2 titlePos = new(gameState.ScreenSize.X / 2 - Raylib.MeasureText("Game Over", titleSize) / 2 + menuOffset.X, gameState.ScreenSize.Y / 6f + menuOffset.Y);
             Raylib.DrawText("Game Over", (int)titlePos.X, (int)titlePos.Y, titleSize, new Color(255, 0, 0, 255));
 
             // Get the position of the "a" in "game".
@@ -232,13 +232,18 @@ namespace Geostorm.Renderer
 
             // Show score.
             int scoreSize = (int)((titleSize + textSize * 3) / 4f);
-            Vector2 scorePos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText($"SCORE: {gameState.Score}", scoreSize) / 2 + menuOffset.X, gameState.ScreenSize.Y / 1.75f + menuOffset.Y);
+            Vector2 scorePos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText($"SCORE: {gameState.Score}", scoreSize) / 2 + menuOffset.X, gameState.ScreenSize.Y / 2.4f + menuOffset.Y);
             Raylib.DrawText($"SCORE: {gameState.Score}", (int)scorePos.X, (int)scorePos.Y, scoreSize, Color.WHITE);
+
+            // Show highscore.
+            int highscore = BitConverter.ToInt32(System.IO.File.ReadAllBytes("highscore.bin"));
+            Vector2 highscorePos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText($"HIGHSCORE: {highscore}", scoreSize) / 2 + menuOffset.X, scorePos.Y + scoreSize + 10);
+            Raylib.DrawText($"HIGHSCORE: {highscore}", (int)highscorePos.X, (int)highscorePos.Y, scoreSize, Color.WHITE);
 
             // Show duration.
             int gameDurationI = (int)gameState.GameDuration;
-            Vector2 duarionPos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText($"DURATION: {gameDurationI}s", scoreSize) / 2 + menuOffset.X, gameState.ScreenSize.Y / 1.75f + menuOffset.Y);
-            Raylib.DrawText($"DURATION: {gameDurationI}s", (int)duarionPos.X, (int)duarionPos.Y + scoreSize + 10, scoreSize, Color.WHITE);
+            Vector2 durationPos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText($"DURATION: {gameDurationI}s", scoreSize) / 2 + menuOffset.X, highscorePos.Y + scoreSize * 2f + 10);
+            Raylib.DrawText($"DURATION: {gameDurationI}s", (int)durationPos.X, (int)durationPos.Y, scoreSize, Color.WHITE);
 
             // Restart prompt.
             Vector2 restartPos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText("PRESS SPACE / LEFT SHIFT", textSize) / 2 + menuOffset.X, gameState.ScreenSize.Y - 120 + menuOffset.Y);
