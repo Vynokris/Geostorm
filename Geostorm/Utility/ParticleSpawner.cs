@@ -15,10 +15,18 @@ namespace Geostorm.Utility
             for (int i = 0; i < gameEvents.Count; i++)
             {
                 if (gameEvents[i] is EnemyKilledEvent killEvent) 
+                { 
                     gameEvents.Add(new ParticleSpawnedEvent(ParticlesPerKill, killEvent.enemy.Pos, killEvent.enemy.Color));
 
+                    if (killEvent.enemy is Snake snake)
+                        foreach (SnakeBodyPart bodyPart in snake.BodyParts)
+                            gameEvents.Add(new ParticleSpawnedEvent(ParticlesPerKill/4, bodyPart.Pos, bodyPart.Color));
+                }
+
                 if (gameEvents[i] is SnakeBodyPartHitEvent hitEvent)
+                { 
                     gameEvents.Add(new ParticleSpawnedEvent(3, hitEvent.snakeBodyPart.Pos, hitEvent.snakeBodyPart.Color));
+                }
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using static System.MathF;
+using static MyMathLib.Arithmetic;
 using static MyMathLib.Geometry2D;
 
 using Geostorm.GameData;
@@ -17,6 +18,7 @@ namespace Geostorm.Core
         public float SpreadDist     = 15f;
         public float SpreadAngle    = 0f;
         public float SpreadFwd      = 0f;
+        public bool  DoUpgrades     = true;
 
         public Weapon() { }
 
@@ -63,6 +65,45 @@ namespace Geostorm.Core
                 }
 
                 ShootCooldown.Reset();
+            }
+        }
+
+
+        // ----- Upgrades ----- //
+
+        public void Upgrade(in int scoreMultiplier)
+        {
+            if (DoUpgrades)
+            { 
+                // Default.
+                if (scoreMultiplier == 1) { 
+                    LoadDefault();
+                }
+                else if (scoreMultiplier < 30) { 
+                    BulletsPerShot = scoreMultiplier / 5 + 2;
+                    SpreadDist     = Remap(ClampUnder(BulletsPerShot, 5), 2, 5, 15, 0);
+                    SpreadAngle    = Remap(BulletsPerShot, 2, 6, 0, PI / 48);
+                    ShootCooldown.ChangeDuration(Remap(scoreMultiplier, 1, 30, 0.1f, 0.25f));
+                }
+
+                // Golden falcon.
+                else if (scoreMultiplier == 30)
+                    LoadGoldenFalcon();
+                else if (scoreMultiplier < 60) { 
+
+                }
+
+                // Neutron star.
+                else if (scoreMultiplier == 60)
+                    LoadNeutronStar();
+                else if (scoreMultiplier < 100) { 
+                    BulletsPerShot = (int)Remap(scoreMultiplier, 60, 100, 8, 40);
+                    SpreadAngle    = Remap(BulletsPerShot, 8, 40, PI / 4, PI / 20);
+                }
+
+                // Destroyer of worlds.
+                else if (scoreMultiplier == 100)
+                    LoadDestroyerOfWorlds();
             }
         }
 
@@ -121,7 +162,7 @@ namespace Geostorm.Core
 
         public void LoadGoldenFalcon()
         {
-            ShootCooldown.ChangeDuration(0.3f);
+            ShootCooldown.ChangeDuration(0.25f);
             BulletsPerShot = 12;
             FwdOffset      = 21f;
             SpreadDist     = 18f;

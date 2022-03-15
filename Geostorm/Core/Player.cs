@@ -41,7 +41,7 @@ namespace Geostorm.Core
 
                 // Initiate a dash by going at dashing velocity in the moving dir.
                 if (DashDuration.CompletionRatio() >= 0.9f)
-                    Velocity = Vector2FromAngle(dirAngle, DashVelocity);
+                    Velocity = Velocity.GetModifiedLength(DashVelocity);
 
                 // If the player is under the maximum velocity, make him accelerate.
                 else if (Velocity.Length() < MaxVelocity)
@@ -53,9 +53,11 @@ namespace Geostorm.Core
             }
 
             // -- Slow down -- //
-            else if (Velocity.Length() > 0)
+            else if (Velocity.LengthSquared() > 0)
             {
                 Velocity *= 0.97f;
+                if (Velocity.LengthSquared() < 0.001f * 0.001f)
+                    Velocity = Vector2Zero();
             }
 
             // -- Dash slow down -- //
