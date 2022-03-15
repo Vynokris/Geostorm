@@ -28,9 +28,17 @@ namespace Geostorm.Utility
 
         public bool HasEnded()
         {
-            if (Counter > 0)
-                return false;
-            return true;
+            return !(Counter > 0);
+        }
+
+        public bool FirstFrame(float deltaTime)
+        {
+            return (Counter + deltaTime > Duration);
+        }
+
+        public bool LastFrame(float deltaTime)
+        {
+            return (Counter > 0 && Counter - deltaTime < 0);
         }
 
         public float CompletionRatio()

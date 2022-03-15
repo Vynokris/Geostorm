@@ -147,6 +147,8 @@ namespace Geostorm.Renderer
             if (BlinkCooldown.Update(gameState.DeltaTime)) 
             { 
                 blinkColor = new Color(50, 50, 50, 255);
+                if (BlinkDuration.FirstFrame(gameState.DeltaTime))
+                    gameEvents.Add(new UiFlickerEvent());
 
                 if (BlinkDuration.Update(gameState.DeltaTime)) 
                 { 
@@ -215,6 +217,8 @@ namespace Geostorm.Renderer
             if (BlinkCooldown.Update(gameState.DeltaTime)) 
             { 
                 blinkColor = new Color(50, 0, 0, 255);
+                if (BlinkDuration.FirstFrame(gameState.DeltaTime))
+                    gameEvents.Add(new UiFlickerEvent());
 
                 if (BlinkDuration.Update(gameState.DeltaTime)) 
                 { 
@@ -233,8 +237,8 @@ namespace Geostorm.Renderer
 
             // Show duration.
             int gameDurationI = (int)gameState.GameDuration;
-            Vector2 duarionPos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText($"DURATION: {gameDurationI}", scoreSize) / 2 + menuOffset.X, gameState.ScreenSize.Y / 1.75f + menuOffset.Y);
-            Raylib.DrawText($"DURATION: {gameDurationI}", (int)duarionPos.X, (int)duarionPos.Y + scoreSize + 10, scoreSize, Color.WHITE);
+            Vector2 duarionPos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText($"DURATION: {gameDurationI}s", scoreSize) / 2 + menuOffset.X, gameState.ScreenSize.Y / 1.75f + menuOffset.Y);
+            Raylib.DrawText($"DURATION: {gameDurationI}s", (int)duarionPos.X, (int)duarionPos.Y + scoreSize + 10, scoreSize, Color.WHITE);
 
             // Restart prompt.
             Vector2 restartPos = new((int)gameState.ScreenSize.X / 2 - Raylib.MeasureText("PRESS SPACE / LEFT SHIFT", textSize) / 2 + menuOffset.X, gameState.ScreenSize.Y - 120 + menuOffset.Y);
