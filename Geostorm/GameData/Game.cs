@@ -64,7 +64,7 @@ namespace Geostorm.GameData
         public void Update(ref GameState gameState, in GameInputs gameInputs)
         {
             // Update the ambiance music.
-            soundController.UpdateAmbiance();
+            soundController.UpdateAmbiance(gameState.DeltaTime);
 
             // Update the game state.
             gameState.Score      = Score;
