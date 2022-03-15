@@ -51,8 +51,8 @@ namespace Geostorm.Renderer
             // Get the monitor width and set the window size to it.
             ScreenWidth  = Raylib.GetMonitorWidth(0);
             ScreenHeight = Raylib.GetMonitorHeight(0);
-            Raylib.SetWindowSize(ScreenWidth, ScreenHeight+1);
-            Raylib.SetWindowPosition(0, -1);
+            Raylib.SetWindowSize(ScreenWidth, ScreenHeight);
+            Raylib.ToggleFullscreen();
 
             // Adjust the bloom intensity accrding to screen size.
             BloomIntensity = (int)(BloomIntensity * ScreenWidth / 2560f);

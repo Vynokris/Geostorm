@@ -5,6 +5,7 @@ using System.Linq;
 using Raylib_cs;
 
 using Geostorm.GameData;
+using Geostorm.Utility;
 
 namespace Geostorm.Renderer
 {
@@ -35,10 +36,9 @@ namespace Geostorm.Renderer
         public List<Sound> sounds = new();
         public List<bool>  soundsPlayedThisFrame;
 
-        public List<Sound>   ambiances       = new();
-        public AmbianceNames currentAmbiance = AmbianceNames.None;
-
-        public Music BassTheme = Raylib.LoadMusicStream("Sounds/Ambiance/BassTheme.ogg");
+        public Music    Ambiance     = Raylib.LoadMusicStream("Sounds/Ambiance.ogg");
+        public Sound    BassTheme    = Raylib.LoadSound("Sounds/BassTheme.ogg");
+        public Cooldown BassCooldown = new(20);
 
         public Random Rng = new();
 
@@ -56,53 +56,34 @@ namespace Geostorm.Renderer
             Raylib.SetSoundVolume(sounds[(int)SoundNames.UiFlicker],    0.6f);
             Raylib.SetSoundVolume(sounds[(int)SoundNames.PlayerDash],   0.1f);
             Raylib.SetSoundVolume(sounds[(int)SoundNames.BulletShot],   0.3f);
-            Raylib.SetSoundVolume(sounds[(int)SoundNames.EnemyKilled],  0.6f);
+            Raylib.SetSoundVolume(sounds[(int)SoundNames.EnemyKilled],  0.4f);
             Raylib.SetSoundVolume(sounds[(int)SoundNames.GeomPickedUp], 0.7f);
 
-            // Load all of the game's ambiances.
-            for (int i = 0; i < 4; i++)
-            {
-                string ambianceName = "Sounds/Ambiance/" + ((AmbianceNames)i).ToString() + ".ogg";
-                ambiances.Add(Raylib.LoadSound(ambianceName));
-            }
+            // Change the ambiance volume.
+            Raylib.SetMusicVolume(Ambiance, 0.2f);
 
-            // Change the ambiance volumes.
-            Raylib.SetSoundVolume(ambiances[(int)AmbianceNames.Monolith],    0.2f);
-            Raylib.SetSoundVolume(ambiances[(int)AmbianceNames.EeryVoid],    0.2f);
-            Raylib.SetSoundVolume(ambiances[(int)AmbianceNames.DeepSpace],   0.2f);
-            Raylib.SetSoundVolume(ambiances[(int)AmbianceNames.AlienVoices], 0.2f);
+            // Play the ambiance and loop it.
+            Ambiance.looping = true;
+            Raylib.PlayMusicStream(Ambiance);
         }
 
         ~SoundController()
         {
             foreach (Sound sound in sounds)
                 Raylib.UnloadSound(sound);
-            foreach (Sound ambiance in ambiances)
-                Raylib.UnloadSound(ambiance);
+            Raylib.UnloadMusicStream(Ambiance);
         }
 
-        public void UpdateAmbiance()
+        public void UpdateAmbiance(float deltaTime)
         {
             // Update ambiance.
-            Raylib.UpdateMusicStream(BassTheme);
+            Raylib.UpdateMusicStream(Ambiance);
 
-            // 0.01% chance to play the bass loop.
-            if (!Raylib.IsMusicStreamPlaying(BassTheme) && Rng.Next(0, 10000) < 1)
+            // Play the bass theme if the bass cooldown is finished,
+            if (!Raylib.IsSoundPlaying(BassTheme) && BassCooldown.Update(deltaTime))
             {
-                Raylib.PlayMusicStream(BassTheme);
-            }
-
-            // 0.3% chance to play a random ambiance sounds.
-            if (currentAmbiance == AmbianceNames.None && Rng.Next(0, 10000) < 30)
-            {
-                currentAmbiance = (AmbianceNames)Rng.Next(0, ambiances.Count);
-                Raylib.PlaySoundMulti(ambiances[(int)currentAmbiance]);
-            }
-
-            // Check if the current ambiance if still playing.
-            if (currentAmbiance != AmbianceNames.None && !Raylib.IsSoundPlaying(ambiances[(int)currentAmbiance]))
-            {
-                currentAmbiance = AmbianceNames.None;
+                Raylib.PlaySound(BassTheme);
+                BassCooldown.ChangeDuration(Rng.Next(20, 30));
             }
         }
         
