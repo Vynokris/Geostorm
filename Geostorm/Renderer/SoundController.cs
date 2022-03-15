@@ -38,7 +38,7 @@ namespace Geostorm.Renderer
         public List<Sound>   ambiances       = new();
         public AmbianceNames currentAmbiance = AmbianceNames.None;
 
-        public Music BassTheme = Raylib.LoadMusicStream("Sounds/Ambiance/BassTheme.mp3");
+        public Music BassTheme = Raylib.LoadMusicStream("Sounds/Ambiance/BassTheme.ogg");
 
         public Random Rng = new();
 
@@ -48,7 +48,7 @@ namespace Geostorm.Renderer
             // Load all of the game's sounds.
             for (int i = 0; i < 9; i++)
             {
-                string soundName = "Sounds/" + ((SoundNames)i).ToString() + ".mp3";
+                string soundName = "Sounds/" + ((SoundNames)i).ToString() + ".ogg";
                 sounds.Add(Raylib.LoadSound(soundName));
             }
 
@@ -62,7 +62,7 @@ namespace Geostorm.Renderer
             // Load all of the game's ambiances.
             for (int i = 0; i < 4; i++)
             {
-                string ambianceName = "Sounds/Ambiance/" + ((AmbianceNames)i).ToString() + ".mp3";
+                string ambianceName = "Sounds/Ambiance/" + ((AmbianceNames)i).ToString() + ".ogg";
                 ambiances.Add(Raylib.LoadSound(ambianceName));
             }
 
