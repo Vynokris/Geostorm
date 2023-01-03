@@ -24,6 +24,7 @@ The goal was to create a space shooter in C# using the Raylib library.
 - The player earns score by killing enemies
 - Defeated enemies drop shards that increment the player's score multiplier when picked up
 - The player's weapon upgrades when their score multiplier is high enough
+- When the player is touched by an enemy, their score multiplier is reset and they are temporarily invincible
 
 ### Enemies
 - Wanderers
@@ -49,9 +50,34 @@ The goal was to create a space shooter in C# using the Raylib library.
 - Post processing:
     - Bloom
     - Chromatic aberration
+    
+### Debug menu
+- Press ```Left Alt + D``` to show the debug menu
+- This menu shows:
+    - The current amount of frames per second
+    - The current duration of each frame (delta time)
+    - The total number of entities
+    - The number of bullets
+    - The number of enemies
+    - The number of particles
 
-### Cheats
-
+### Cheats menu
+- Press ```Left Alt + C``` to show the cheats menu
+- Player cheats:
+    - Add health
+    - Change dash or invincibility durations
+- Weapon cheats:
+    - Change weapon stats
+    - Set weapon stats using presets
+- Enemy cheats:
+    - Disable adaptative wave interval
+    - Change time interval between enemy waves
+    - Kill all enemies
+    - Snake enemy maximum and minimum size
+    - Enemy spawning probabilities
+- Cosmetic settings:
+    - Number of stars
+    - Number of particles per enemy killed
 
 <br>
 
